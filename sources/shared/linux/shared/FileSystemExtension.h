@@ -29,6 +29,11 @@ namespace shared
       ///               so let it in the header file.
       //--------------------------------------------------------------
       static std::string getModulePath();
+      
+      //--------------------------------------------------------------
+      /// \brief			Get the file path relative to current module path
+      //--------------------------------------------------------------
+      static std::string getFileRelativeToModulePath(const std::string & file);
    };
 
 } // namespace shared

@@ -36,5 +36,9 @@ namespace shared
          return boost::filesystem::path(getModuleFullPath()).parent_path().string();                                                                 
       }
 
+      std::string CFileSystemExtension::getFileRelativeToModulePath(const std::string & file)
+      {
+         return (boost::filesystem::path(getModuleFullPath()).parent_path() / boost::filesystem::path(file)).string();
+      }
 
 } // namespace shared
