@@ -2,6 +2,7 @@
 #include "RFXtrxHelpers.h"
 #include <shared/Log.h>
 #include <shared/exception/Exception.hpp>
+#include <limits>
 
 //--------------------------------------------------------------
 /// \brief	The code of RFXtrx.h helpers
@@ -11,9 +12,9 @@ const RBUF dummyRbufToComputeSizes = { {0} };
 
 const size_t RFXMESSAGE_maxSize = sizeof(dummyRbufToComputeSizes);
 
-const BYTE DONT_CHECK_SUBTYPE = std::numeric_limits<BYTE>::max();
-const size_t DONT_CHECK_SIZE = std::numeric_limits<std::size_t>::max();
-const unsigned int DONT_CHECK_SEQUENCE_NUMBER = std::numeric_limits<unsigned int>::max();
+const BYTE DONT_CHECK_SUBTYPE = (std::numeric_limits<BYTE>::max)();
+const size_t DONT_CHECK_SIZE = (std::numeric_limits<std::size_t>::max)();
+const unsigned int DONT_CHECK_SEQUENCE_NUMBER = (std::numeric_limits<unsigned int>::max)();
 
 shared::communication::CByteBuffer toBuffer(const RBUF& rbuf, size_t subStructureSize)
 {

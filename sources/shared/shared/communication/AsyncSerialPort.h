@@ -1,7 +1,6 @@
 #pragma once
 #include <shared/Export.h>
 #include "IAsyncPort.h"
-#include "IReceiveBufferHandler.h"
 
 namespace shared { namespace communication {
 
@@ -11,25 +10,46 @@ namespace shared { namespace communication {
    class YADOMS_SHARED_EXPORT CAsyncSerialPort : public IAsyncPort
    {  
    public:
+      enum E_Parity
+      {
+         parity_none,
+         parity_even,
+         parity_odd
+      };
+
+      enum E_Stopbits
+      { 
+         stopbits_one, 
+         stopbits_onepointfive,
+         stopbits_two
+      };
+
+      enum E_FlowControl
+      { 
+         flow_none, 
+         flow_software,
+         flow_hardware
+      };
+
       //--------------------------------------------------------------
       /// \brief	Constructor
       /// \param[in] port                 Serial port name
       /// \param[in] baudrate             Baudrate (in bauds)
-      /// \param[in] parity               Parity (see boost::asio::serial_port_base::parity::type for values)
-      /// \param[in] characterSize        Character size (from 5 to 8)
-      /// \param[in] stop_bits            Nb of stop bits (see boost::asio::serial_port_base::stop_bits::type for values)
-      /// \param[in] flowControl          Flow control (see boost::asio::serial_port_base::flow_control::type for values)
+      /// \param[in] parity               Parity 
+      /// \param[in] characterSize        Character size 
+      /// \param[in] stop_bits            Nb of stop bits
+      /// \param[in] flowControl          Flow control
       /// \param[in] connectRetryDelay    Delay between 2 connection retries
       /// \param[in] flushAtConnect       If true (default), flush serial port buffers before listening on port
       //--------------------------------------------------------------
       CAsyncSerialPort(
          const std::string& port,
-         boost::asio::serial_port_base::baud_rate baudrate = boost::asio::serial_port_base::baud_rate(9600),
-         boost::asio::serial_port_base::parity parity = boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none),
-         boost::asio::serial_port_base::character_size characterSize = boost::asio::serial_port_base::character_size(8),
-         boost::asio::serial_port_base::stop_bits stop_bits = boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one),
-         boost::asio::serial_port_base::flow_control flowControl = boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none),
-         boost::posix_time::time_duration connectRetryDelay = boost::posix_time::seconds(30),
+         const unsigned int baudRate, 
+         E_Parity parity = parity_none,
+         const unsigned int characterSize = 8,
+         E_Stopbits stop_bits = stopbits_one,
+         E_FlowControl flowControl = flow_none,
+         const unsigned int connectRetryDelay = 30,
          bool flushAtConnect = true);
 
       //--------------------------------------------------------------
@@ -48,107 +68,11 @@ namespace shared { namespace communication {
       virtual void flush();
       // [END] IAsyncPort Implementation
 
-   protected:
-      //--------------------------------------------------------------
-      /// \brief	Establish the connection
-      /// \return true if connected, false else
-      //--------------------------------------------------------------
-      virtual bool connect();
-
-      //--------------------------------------------------------------
-      /// \brief	Close the connection
-      //--------------------------------------------------------------
-      virtual void disconnect();
-
-      //--------------------------------------------------------------
-      /// \brief	Try to connect asynchronously
-      //--------------------------------------------------------------
-      void tryConnect();
-
-      //--------------------------------------------------------------
-      /// \brief	                     Handler called when connect retry timer expires
-      /// \param[in] error             Error code (should be 0)
-      //--------------------------------------------------------------
-      void reconnectTimerHandler(const boost::system::error_code& error);
-
-      //--------------------------------------------------------------
-      /// \brief	Wait for something to read on the port
-      //--------------------------------------------------------------
-      void startRead();
-
-      //--------------------------------------------------------------
-      /// \brief	                     End of read operation handler
-      /// \param[in] error             Result of operation
-      /// \param[in] bytesTransferred  Read bytes number
-      //--------------------------------------------------------------
-      void readCompleted(const boost::system::error_code& error, std::size_t bytesTransferred);
-
-      //--------------------------------------------------------------
-      /// \brief	                     Notify the event handler for connection event
-      /// \param[in] isConnected       Connection state
-      //--------------------------------------------------------------
-      void notifyEventHandler(bool isConnected);
-
    private:
       //--------------------------------------------------------------
-      /// \brief	boost:asio service
+      /// \brief	Private implementation
       //--------------------------------------------------------------
-      boost::asio::io_service m_ioService;
-
-      //--------------------------------------------------------------
-      /// \brief	The boost serial port
-      //--------------------------------------------------------------
-      boost::asio::serial_port m_boostSerialPort;
-
-      //--------------------------------------------------------------
-      /// \brief	Serial port configuration
-      //--------------------------------------------------------------
-      std::string m_port;
-      boost::asio::serial_port_base::baud_rate m_baudrate;
-      boost::asio::serial_port_base::parity m_parity;
-      boost::asio::serial_port_base::character_size m_characterSize;
-      boost::asio::serial_port_base::stop_bits m_stop_bits;
-      boost::asio::serial_port_base::flow_control m_flowControl;
-
-      //--------------------------------------------------------------
-      /// \brief	Read buffer for asynchronous operations
-      //--------------------------------------------------------------
-      CByteBuffer m_asyncReadBuffer;
-
-      //--------------------------------------------------------------
-      /// \brief	The event handler to notify for connection events   
-      //--------------------------------------------------------------
-      event::CEventHandler* m_connectStateEventHandler;
-
-      //--------------------------------------------------------------
-      /// \brief	The event id to notify for connection events  
-      //--------------------------------------------------------------
-      int m_connectStateEventId;
-
-      //--------------------------------------------------------------
-      /// \brief	The receive buffer handler
-      //--------------------------------------------------------------
-      boost::shared_ptr<IReceiveBufferHandler> m_receiveBufferHandler;
-
-      //--------------------------------------------------------------
-      /// \brief	Try to reconnect timer delay
-      //--------------------------------------------------------------
-      const boost::posix_time::time_duration m_connectRetryDelay;
-
-      //--------------------------------------------------------------
-      /// \brief	Try to reconnect timer delay
-      //--------------------------------------------------------------
-      boost::asio::deadline_timer m_connectRetryTimer;
-
-      //--------------------------------------------------------------
-      /// \brief	Thread for asynchronous operations
-      //--------------------------------------------------------------
-      boost::shared_ptr<boost::thread> m_asyncThread;
-
-      //--------------------------------------------------------------
-      /// \brief	Flush serial port buffers before listening on port (just after connection)
-      //--------------------------------------------------------------
-      bool m_flushAtConnect;
+      boost::shared_ptr<IAsyncPort> m_pImpl;
    };
 
 } } // namespace shared::communication

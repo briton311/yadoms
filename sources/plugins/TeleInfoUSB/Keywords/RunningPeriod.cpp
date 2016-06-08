@@ -4,6 +4,7 @@
 #include <shared/plugin/yPluginApi/StandardCapacities.h>
 #include <shared/exception/InvalidParameter.hpp>
 #include <shared/Log.h>
+#include <boost/assign.hpp>
 
 // Shortcut to yPluginApi namespace
 namespace yApi = shared::plugin::yPluginApi;

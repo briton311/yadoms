@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ForecastHelpers.h"
 #include <shared/plugin/yPluginApi/IYPluginApi.h>
+#include <boost/assign.hpp>
 
 namespace yApi = shared::plugin::yPluginApi;
 

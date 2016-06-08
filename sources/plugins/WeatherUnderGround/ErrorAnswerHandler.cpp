@@ -2,6 +2,7 @@
 #include "ErrorAnswerHandler.h"
 #include <shared/Log.h>
 #include <shared/exception/Exception.hpp>
+#include <boost/assign.hpp>
 
 typedef std::list<std::string> EnumValuesTypes;
 

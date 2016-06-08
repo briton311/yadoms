@@ -7,6 +7,7 @@
 #include "IncrementSequenceNumber.h"
 #include <shared/communication/PortException.hpp>
 #include "TeleInfotrxHelpers.h"
+#include <boost/assign.hpp>
 
 CTransceiver::CTransceiver( )
    :m_seqNumberProvider(new CIncrementSequenceNumber()),

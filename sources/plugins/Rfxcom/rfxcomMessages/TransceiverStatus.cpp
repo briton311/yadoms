@@ -2,7 +2,7 @@
 #include <shared/Log.h>
 #include "TransceiverStatus.h"
 #include <shared/StringExtension.h>
-
+#include <boost/assign.hpp>
 
 namespace rfxcomMessages
 {

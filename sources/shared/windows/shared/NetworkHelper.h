@@ -24,7 +24,7 @@ namespace shared
       /// \brief			Return all locals ip
       /// \return a list of ip detected on the computer
       //--------------------------------------------------------------
-      static std::vector<boost::asio::ip::address> getLocalIps();
+      static std::vector<std::string> getLocalIps();
 
    private:
       //--------------------------------------------------------------

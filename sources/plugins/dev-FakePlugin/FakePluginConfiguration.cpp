@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FakePluginConfiguration.h"
 #include <shared/Log.h>
-
+#include <boost/assign.hpp>
 
 CFakePluginConfiguration::~CFakePluginConfiguration()
 {

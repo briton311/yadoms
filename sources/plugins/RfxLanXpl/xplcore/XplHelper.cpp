@@ -100,14 +100,15 @@ std::string CXplHelper::toInstanceId(int instanceNumber)
 boost::asio::ip::udp::endpoint CXplHelper::getFirstIPV4AddressEndPoint()
 {
    //we look for the first ip v4
-   std::vector<boost::asio::ip::address> ips = shared::CNetworkHelper::getLocalIps();
+   std::vector<std::string> ips = shared::CNetworkHelper::getLocalIps();
    
    //we look for the first IP which is not loopback
-   for (std::vector<boost::asio::ip::address>::iterator i = ips.begin(); i != ips.end(); ++i)
+   for (std::vector<std::string>::iterator i = ips.begin(); i != ips.end(); ++i)
    {
-      if(!i->is_loopback())
+      boost::asio::ip::address ip = boost::asio::ip::address::from_string(*i);
+      if(!ip.is_loopback())
       {
-         return boost::asio::ip::udp::endpoint(*i, 0);
+         return boost::asio::ip::udp::endpoint(ip, 0);
       }
    }
       
@@ -118,13 +119,13 @@ boost::asio::ip::udp::endpoint CXplHelper::getFirstIPV4AddressEndPoint()
 
 bool CXplHelper::getEndPointFromInterfaceIp(const std::string & localIPOfTheInterfaceToUse, boost::asio::ip::udp::endpoint & result)
 {
-   std::vector<boost::asio::ip::address> ips = shared::CNetworkHelper::getLocalIps();
+   std::vector<std::string> ips = shared::CNetworkHelper::getLocalIps();
    
-   for (std::vector<boost::asio::ip::address>::iterator i = ips.begin(); i != ips.end(); ++i)
+   for (std::vector<std::string>::iterator i = ips.begin(); i != ips.end(); ++i)
    {
-      if(i->to_string() == localIPOfTheInterfaceToUse)
+      if( *i == localIPOfTheInterfaceToUse)
       {
-         result = boost::asio::ip::udp::endpoint(*i, XplProtocolPort);
+         result = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(*i), XplProtocolPort);
          return true;
       }
    }

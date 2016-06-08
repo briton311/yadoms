@@ -29,9 +29,7 @@ boost::shared_ptr<shared::communication::IAsyncPort> CRfxcomFactory::constructPo
    else
    {
       YADOMS_LOG(information) << "Connecting RFXCom on serial port " << configuration.getSerialPort() << "...";
-      port.reset(new shared::communication::CAsyncSerialPort(
-         configuration.getSerialPort(),
-         boost::asio::serial_port_base::baud_rate(38400)));
+      port.reset(new shared::communication::CAsyncSerialPort(configuration.getSerialPort(), 38400));
    }
 
    port->subscribeForConnectionEvents(eventHandler, evtPortConnectionId);

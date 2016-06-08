@@ -4,6 +4,7 @@
 #include <Poco/URI.h>
 #include <Poco/Path.h>
 #include <shared/Export.h>
+#include <boost/function.hpp>
 
 namespace shared { namespace web { 
 

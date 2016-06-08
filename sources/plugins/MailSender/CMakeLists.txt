@@ -5,6 +5,8 @@ if(${PocoNetSSLFound})
    #########################################
 
    set(MAILSENDER_SOURCES
+      stdafx.h
+      stdafx.cpp
       IMSConfiguration.h
       MSConfiguration.h
       MSConfiguration.cpp

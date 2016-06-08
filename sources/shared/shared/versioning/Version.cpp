@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Version.h"
 #include <shared/Log.h>
+#include <Poco/StringTokenizer.h>
 
 namespace shared { namespace versioning {
 
@@ -11,12 +12,9 @@ namespace shared { namespace versioning {
 
    CVersion::CVersion(const std::string & stringVersion)
    {
-
-      std::vector<std::string> allDigits;
-      //split on slash or anti slash
-      boost::split(allDigits, stringVersion, boost::is_any_of(".,"), boost::algorithm::token_compress_on);
-
-      for (std::vector<std::string>::iterator i = allDigits.begin(); i != allDigits.end(); ++i)
+      //split on '.' or ','
+      Poco::StringTokenizer tokenizer(stringVersion, ".,", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+      for (Poco::StringTokenizer::Iterator i = tokenizer.begin(); i != tokenizer.end(); ++i)
       {
          try
          {
@@ -29,9 +27,6 @@ namespace shared { namespace versioning {
             m_versionInfo.push_back(0);
          }
       }
-
-      //while(m_versionInfo.size() < 4)
-      //  m_versionInfo.push_back(0);
    }
 
    CVersion::CVersion(int major, int minor, int buildNumber /*= 0*/, int revision /*= 0*/)

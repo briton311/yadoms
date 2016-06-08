@@ -3,6 +3,7 @@
 #include "../../shared/exception/Exception.hpp"
 #include "../../shared/Log.h"
 #include "NetworkHelper.h"
+#include <boost/asio.hpp>
 
 namespace shared
 {
@@ -15,9 +16,9 @@ CNetworkHelper::~CNetworkHelper()
 {
 }
 
-std::vector<boost::asio::ip::address> CNetworkHelper::getLocalIps()
+std::vector<std::string> CNetworkHelper::getLocalIps()
 {
-   std::vector<boost::asio::ip::address> result = std::vector<boost::asio::ip::address>();
+   std::vector<std::string> result;
    boost::asio::io_service io_service;
    boost::asio::ip::udp::resolver resolver(io_service);
    boost::asio::ip::udp::resolver::query query(boost::asio::ip::host_name(), "");
@@ -30,7 +31,7 @@ std::vector<boost::asio::ip::address> CNetworkHelper::getLocalIps()
       boost::asio::ip::address addr = iter->endpoint().address();
       //we manage only ipv4
       if(addr.is_v4())
-         result.push_back(addr);
+         result.push_back(addr.to_string());
       
       ++iter;
    }

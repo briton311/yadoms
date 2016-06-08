@@ -227,9 +227,9 @@ const shared::plugin::information::IInformation& CYPluginApiImplementation::getI
    return *m_informations;
 }
 
-const boost::filesystem::path CYPluginApiImplementation::getPluginPath() const
+const std::string CYPluginApiImplementation::getPluginPath() const
 {
-   return m_libraryPath;
+   return m_libraryPath.string();
 }
 
 shared::CDataContainer CYPluginApiImplementation::getConfiguration() const

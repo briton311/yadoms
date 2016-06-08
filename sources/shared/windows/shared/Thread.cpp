@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Thread.h"
-#include <windows.h>
 
 namespace shared
 {

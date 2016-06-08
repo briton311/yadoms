@@ -41,15 +41,15 @@ namespace shared { namespace communication {
       //--------------------------------------------------------------
       static const std::string codeLabelsToString(ECode code)
       {
-         static const std::map<ECode, std::string> CodeLabels = boost::assign::map_list_of
-            (kConnectionClosed, "connection was closed")
-            (kConnectionError, "connection error");
-
-         std::map<ECode, std::string>::const_iterator itCodeLabel = CodeLabels.find(code);
-         if (itCodeLabel == CodeLabels.end())
+         switch (code)
+         {
+         case kConnectionClosed:
+            return "connection was closed";
+         case kConnectionError:
+            return "connection error";
+         default:
             return boost::lexical_cast<std::string>(code);
-
-         return itCodeLabel->second;
+         }
       }
    };
 

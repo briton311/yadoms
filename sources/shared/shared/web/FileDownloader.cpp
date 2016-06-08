@@ -9,6 +9,8 @@
 #include "exception/DownloadFailed.hpp"
 #include <Poco/File.h>
 #include <fstream>
+#include <boost/asio.hpp>
+#include <boost/algorithm/string.hpp>
 
 using boost::asio::ip::tcp;
 

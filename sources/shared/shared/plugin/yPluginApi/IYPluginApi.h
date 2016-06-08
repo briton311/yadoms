@@ -274,7 +274,7 @@ namespace shared { namespace plugin { namespace yPluginApi
       ///\brief Get the plugin binary path
       ///\return the plugin binary path
       //-----------------------------------------------------      
-      virtual const boost::filesystem::path getPluginPath() const = 0;
+      virtual const std::string getPluginPath() const = 0;
 
 
       //----------------------------------------------------------------------------------------------------------------

@@ -25,10 +25,10 @@ namespace shared { namespace plugin { namespace yPluginApi
       /// \param [in] packagePath The package path (default to "package.json" from module path)
       //--------------------------------------------------------------
       void initializeWith(const shared::CDataContainer& configurationData,
-         const boost::filesystem::path& packagePath = shared::CFileSystemExtension::getModulePath() / boost::filesystem::path("package.json"))
+         const std::string & packagePath = shared::CFileSystemExtension::getFileRelativeToModulePath("package.json"))
       {
          // Reload package file
-         m_packageData.deserializeFromFile(packagePath.string());
+         m_packageData.deserializeFromFile(packagePath);
 
          m_configurationData.initializeWith(configurationData);
       }

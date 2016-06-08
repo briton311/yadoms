@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include <boost/asio.hpp>
 #include "DynamicLibrary.h"
 #include "../../shared/exception/Exception.hpp"
 #include "../../shared/Log.h"
