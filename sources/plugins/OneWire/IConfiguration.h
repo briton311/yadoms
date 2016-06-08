@@ -1,5 +1,6 @@
 #pragma once
 #include <shared/DataContainer.h>
+#include <boost/filesystem.hpp>
 
 //--------------------------------------------------------------
 /// \brief	Interface of plugin configuration
