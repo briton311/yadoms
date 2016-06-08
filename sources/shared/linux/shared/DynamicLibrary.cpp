@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include "../../shared/Log.h"
 #include "../../shared/exception/InvalidParameter.hpp"
+#include <boost/filesystem.hpp>
 
 namespace shared
 {
