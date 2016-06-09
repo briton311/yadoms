@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <ifaddrs.h>
+#include <boost/asio.hpp>
 
 namespace shared
 {
