@@ -5,6 +5,7 @@
 #include "Peripherals.h"
 
 #include <termios.h>
+#include <boost/filesystem.hpp>
 
 namespace shared
 {
