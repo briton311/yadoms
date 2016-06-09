@@ -4,6 +4,7 @@
 // Platforms peripherals management (serial ports...)
 //
 #pragma once
+#include <boost/asio.hpp>
 
 namespace shared
 {
