@@ -171,10 +171,29 @@ namespace pluginSystem
       YADOMS_LOG(trace) << "[RECEIVE] message " << toYadomsProtoBuffer.OneOf_case() << " from plugin instance #" << m_pluginApi->getPluginId() << (m_onReceiveHook ? " (onReceiveHook ENABLED)" : "");
 
       {
+         if (toYadomsProtoBuffer.OneOf_case() == toYadoms::msg::kDeviceExists)
+         {
+            YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] m_onReceiveHook = " << m_onReceiveHook;
+            if (m_onReceiveHook)
+            {
+               if (m_onReceiveHookMutex.try_lock())
+                  YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] m_onReceiveHookMutex is lockable";
+               else
+                  YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] m_onReceiveHookMutex is !!!NOT!!! lockable";
+            }
+         }
+
          boost::lock_guard<boost::recursive_mutex> lock(m_onReceiveHookMutex);
          if (m_onReceiveHook && m_onReceiveHook(toYadomsProtoBuffer))
          {
+            if (toYadomsProtoBuffer.OneOf_case() == toYadoms::msg::kDeviceExists)
+               YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] m_onReceiveHook called";
+
             m_onReceiveHook.clear();
+
+            if (toYadomsProtoBuffer.OneOf_case() == toYadoms::msg::kDeviceExists)
+               YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] m_onReceiveHook cleared";
+
             return;
          }
       }
@@ -245,11 +264,16 @@ namespace pluginSystem
 
    void CIpcAdapter::processDeviceExistsRequest(const toYadoms::DeviceExitsRequest& msg)
    {
+      YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] processDeviceExistsRequest call(enter)";
+
       toPlugin::msg ans;
       auto answer = ans.mutable_deviceexists();
 
+      YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] processDeviceExistsRequest call(before call m_pluginApi->deviceExists)";
       answer->set_exists(m_pluginApi->deviceExists(msg.device()));
+      YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] processDeviceExistsRequest call(after call m_pluginApi->deviceExists)";
       send(ans);
+      YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] processDeviceExistsRequest call(after call send(ans))";
    }
 
    void CIpcAdapter::processDeviceDetailsRequest(const toYadoms::DeviceDetailsRequest& msg)

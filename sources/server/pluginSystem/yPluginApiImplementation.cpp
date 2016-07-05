@@ -44,7 +44,10 @@ namespace pluginSystem
 
    bool CYPluginApiImplementation::deviceExists(const std::string& device) const
    {
-      return m_deviceManager->deviceExists(getPluginId(), device);
+      YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] CYPluginApiImplementation::deviceExists(" << device << ")";
+      auto b = m_deviceManager->deviceExists(getPluginId(), device);
+      YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] CYPluginApiImplementation::deviceExists returns " << (b ? "true" : " false");
+      return b;
    }
 
    shared::CDataContainer CYPluginApiImplementation::getDeviceDetails(const std::string& device) const

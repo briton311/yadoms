@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DeviceManager.h"
 #include "notification/Helpers.hpp"
+#include <shared/Log.h>
 
 namespace dataAccessLayer {
 
@@ -20,7 +21,10 @@ namespace dataAccessLayer {
 
       bool CDeviceManager::deviceExists(const int pluginId, const std::string & deviceName) const
       {
-         return m_deviceRequester->deviceExists(pluginId, deviceName);
+         YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] CDeviceManager::deviceExists(" << pluginId << ", " << deviceName << ")";
+         auto b = m_deviceRequester->deviceExists(pluginId, deviceName);
+         YADOMS_LOG(trace) << "[fix_no_answer_to_device_exist] CDeviceManager::deviceExists returns" << (b ? "true" : "false");
+         return b;
       }      
 
       boost::shared_ptr<database::entities::CDevice> CDeviceManager::getDevice(int deviceId) const
