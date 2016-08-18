@@ -180,6 +180,8 @@ namespace pluginSystem
       {
          std::vector<int> keywordIdList;
 
+         auto time1 = boost::posix_time::microsec_clock::local_time();
+         
          boost::shared_ptr<const database::entities::CDevice> deviceEntity = m_deviceManager->getDevice(getPluginId(), device);
          for (auto iter = dataVect.begin(); iter != dataVect.end(); ++iter)
          {
@@ -187,6 +189,12 @@ namespace pluginSystem
             keywordIdList.push_back(keywordEntity->Id);
          }
          m_acquisitionHistorizer->saveData(keywordIdList, dataVect);
+
+         auto time2 = boost::posix_time::microsec_clock::local_time();
+
+         boost::posix_time::time_duration diff = time2 - time1;
+
+         std::cout << "[fix_no_answer_to_device_exist] HistorizeData(vector):" << diff.total_milliseconds() << "ms" << std::endl;
       }
       catch (shared::exception::CEmptyResult& e)
       {
