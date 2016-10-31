@@ -11,7 +11,11 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['', '.ts', '.js']
+    extensions: ['', '.ts', '.js'],
+    alias: {
+      moment: 'moment/min/moment-with-locales.js',
+    },
+    root: helpers.root('src')    
   },
 
   module: {
@@ -37,7 +41,9 @@ module.exports = {
         test: /\.css$/,
         include: helpers.root('src', 'app'),
         loader: 'raw'
-      }
+      },
+      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
+      { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
     ]
   },
 
@@ -48,6 +54,26 @@ module.exports = {
 
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    })
+    }),
+
+    new webpack.ProvidePlugin({
+      jQuery: 'jquery',
+      $: 'jquery',
+      jquery: 'jquery'
+    }),    
+
+    /**
+     * Fix moment js "locale" folder search
+     */
+    new webpack.ContextReplacementPlugin(/^\.\/locale$/, context => {
+      if (!/[\/\\]moment[\/\\]/.test(context.context)) { return }
+      // context needs to be modified in place
+      Object.assign(context, {
+        // include only CJK
+        regExp: /^\.\/(ja|ko|zh)/,
+        // point to the locale data folder relative to moment's src/lib/locale
+        request: '../locale'
+      });
+    }),    
   ]
 };
