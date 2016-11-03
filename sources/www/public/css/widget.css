@@ -1,0 +1,206 @@
+.widget {
+   background-color: transparent;
+   float: left;
+   width: 100px;
+   height: 100px;
+}
+
+.widget .is-dragging,
+.widget .is-positioning-post-drag,
+.widget .ui-draggable-dragging {
+  background: #C90;
+  z-index: 20;
+}
+
+.ui-resizable-se {
+    bottom: 2.5px !important;
+}
+
+#new-widget-carousel .carousel-inner {
+    height: 250px;
+    background: slategray;
+}
+
+#new-widget-carousel .carousel-caption {
+    clear: both;
+    left: auto;
+    bottom: auto;
+    text-align: center;
+    width: 60%;
+}
+
+.carousel-widget-preview {
+    clear: both;
+    left: auto;
+    bottom: auto;
+    text-align: center;
+    margin: 20px auto;
+}
+
+/*Widget container management*/
+
+.grid-item-content {
+    height: 100%;
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 2.5px;
+    overflow: hidden!important;
+}
+
+.panel-widget {
+    margin-bottom: 0;
+    /*display: table;*/
+    /*table-layout: fixed;*/
+    width: 100%;
+    height: 100%;
+    /*-webkit-box-shadow: 1px 1px 3px 0 rgb(193, 193, 193);
+    -ms-box-shadow: 1px 1px 3px 0 rgb(193, 193, 193);
+    box-shadow: 1px 1px 3px 0 rgb(193, 193, 193);*/
+    border: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel-widget-header {
+    text-align: center;
+    white-space: nowrap;
+    max-height: 25px;
+    -moz-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    padding: 1px 0;
+    width: 100%;
+    border-radius: 0;
+    flex: 0 0 25px;
+}
+
+.panel-widget-body {
+    padding: 0;
+    overflow: hidden;
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-widget-customization-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 18;
+    margin: 2.5px;
+    background-repeat: no-repeat;
+    -ms-border-top-left-radius: 4px;
+    border-top-left-radius: 4px;
+    -ms-border-top-right-radius: 4px;
+    border-top-right-radius: 4px;
+    background-image: url("../images/roadworks-widget.png");
+    background-position: right top;
+}
+
+.widgetCustomizationToolbar {
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    margin-top: 3px;
+}
+
+.widgetCustomizationButton {
+    color: white;
+    -ms-text-shadow: 0 0 2px rgb(0, 0, 0);
+    text-shadow: 0 0 2px rgb(0, 0, 0);
+}
+
+.panel-widget-title-toolbar {
+    float: left;
+    /*border-right: 1px solid white;*/
+    padding-right: 2.5px;
+    margin-top: 2px;   
+}
+
+.panel-widget-title {
+    margin: 0 auto; 
+	overflow: hidden; 
+	white-space: nowrap;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-top: 2px;
+}
+
+/*Widget toolbar API*/
+
+.widget-toolbar-pressed-button {
+    background: white;
+    color: #428bca !important;
+    padding-right: 4px;
+    padding-left: 4px;
+    -ms-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.widget-toolbar-button {
+    color: white;
+    float: left;
+    margin-left: 4px;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+.widget-toolbar-button:hover {
+    color: white;
+}
+
+.widget-toolbar-separator {
+    float: left;
+    height: 20px;
+    border-left: 1px solid white;
+    /* margin-top: 2px; */
+    /* margin-bottom: 2px; */
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.widget-toolbar-element {
+    float: left;
+    color: white;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.widget-toolbar-battery {
+    float: left;
+    color: white;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.widget-toolbar-battery span[class~=fa-battery-0] {
+	color: red;
+}
+
+.textfit {
+    min-height: 20px;   /* min font height is 14, so min height is 14*1.41 ~= 20*/
+}
+
+.textfit-in-parent {
+    margin: auto;
+    flex: 1;
+}
+
+/*Permit to use a span instead of a <a> in a dropdown menu*/
+.dropdown-menu > li > span {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}

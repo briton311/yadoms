@@ -25,3 +25,6 @@ const moment = require('moment');
 moment.locale(window.navigator.language);
 
 console.log(moment().format('LLL'));
+
+
+import 'jquery-ui/themes/base/all.css';

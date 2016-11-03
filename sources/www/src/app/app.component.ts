@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
-import '../../public/css/styles.css';
+import '../../public/css/bootstrap-non-responsive.css';
+import '../../public/css/yadoms.css';
+import '../../public/css/widget.css';
+import '../../public/css/loading.css';
+
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',

@@ -1,16 +1,44 @@
-<div class="page-container">                                    
-  <main class="text-center">
-    <h1>Hello from Angular App with Webpack ;-)</h1>
-    <img src="../../public/images/angular.png">
-    
-    <a routerLink="/dashboard">Dashboard</a>
-    <a routerLink="/home">Home</a>
-  </main>
+<!-- Fixed navbar -->
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container">
+        <div class="row" id="mainNavBar">
+            <div class="col-md-12">
+                <div class="navbar-header navbar-header-pointer" routerLink="/">
+                    <img src="../../public/images/icon_256.png" class="img-responsive pull-left application-logo" />
+                    <a class="navbar-brand" >Yadoms</a>
+                </div>
+                <div class="navbar-right">
+                    <button href="#" class="btn btn-success pull-left customization-item hidden" id="btn-add-widget">
+                        <i class="fa fa-puzzle-piece"></i>
+                        <span data-i18n="mainPage.customization.addNewWidget"></span>
+                    </button>
+                    <ul class="nav navbar-nav">
+                        <li><a routerLink="/dashboard"class="" id="btn-show-dashboard" data-i18n="[title]mainPage.menu.dashboard"><i class="fa fa-cog"></i></a></li>
+                        <li><a class="" id="customizeButton" data-i18n="[title]mainPage.menu.customization"><i class="fa fa-wrench"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="nav navbar-nav" id="pageMenu">
+                    <ul class="nav nav-pills nav-justified page-tabs">
+                        <!-- Nav pills of pages will be inserted here -->
+                        <li class="customization-item hidden" id="btn-add-page">
+                            <a>
+                                <span>&nbsp;</span>
+                                <div class="customizationToolbar pageCustomizationToolbar">
+                                    <div class="customizationButton pageCustomizationButton" data-i18n="[title]mainPage.customization.addNewPage">
+                                        <i class="fa fa-plus"></i>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div><!--/.nav-collapse -->
+</div>
 
-  <router-outlet></router-outlet>                
-</div>                                                          
-<footer>                                                                    
-    <div class="container pull-right">     
-      <span>{{footerVersionContent}} {{footerContent}}</span>                          
-    </div>                                                      
-</footer>
+<router-outlet></router-outlet>
