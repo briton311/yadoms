@@ -8,5 +8,12 @@ import { Component, OnInit } from '@angular/core';
 export class HomeComponent implements OnInit {
     constructor() { }
 
-    ngOnInit() { }
+    ngOnInit() { 
+        // main.js
+        var Packery = require('packery');
+
+        var pckry = new Packery( '.grid', {
+        // options...
+        });
+    }
 }
