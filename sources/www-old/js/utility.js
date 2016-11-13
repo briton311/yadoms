@@ -416,8 +416,21 @@ function getRule( RuleName ) {
  * @param a The the second parameter
  */
 function CustomSortFriendlyName(a, b) {
-	assert( a.friendlyName, "Cell of array should have parameter friendlyName" );
-	assert( b.friendlyName, "Cell of array should have parameter friendlyName" );
+	
+	if (typeof(a.friendlyName) == "undefined")
+	{
+		console.error("objet have no parameter friendlyName");
+		console.error(a);
+		return 1;
+	}
+	
+	if (typeof(b.friendlyName) == "undefined")
+	{
+		console.error("objet have no parameter friendlyName");
+		console.error(b);
+		return 1;
+	}
+	
 	return (a.friendlyName.toLowerCase() > b.friendlyName.toLowerCase()) ? 1 : -1;
 }
 
@@ -436,8 +449,21 @@ function sortListItemsWithFriendlyName( arguments ) {
  * @param a The the second parameter
  */
 function CustomSortDisplayName(a, b) {
-	assert( a.displayName, "Cell of array should have parameter displayName" );
-	assert( b.displayName, "Cell of array should have parameter displayName" );
+	
+	if (typeof(a.displayName) == "undefined")
+	{
+		console.error("object have no parameter displayName");
+		console.error(a);
+		return 1;
+	}
+	
+	if (typeof(b.displayName) == "undefined")
+	{
+		console.error("object have no parameter displayName");
+		console.error(b);
+		return 1;
+	}
+	
 	return (a.displayName.toLowerCase() > b.displayName.toLowerCase()) ? 1 : -1;
 }
 

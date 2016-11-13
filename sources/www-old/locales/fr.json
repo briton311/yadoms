@@ -133,17 +133,20 @@
         "takeMeHome": "Retourner à l'accueil"
     },
   "modals": {
+    "pickup": {
+      "add": "Ajouter",
+      "goBack": "Retour",	
+      "descriptionHeader": "Description:",
+      "versionHeader": "Version:",
+      "authorHeader": "Author:",
+	  "errorDuringGettingPackages": "Error during requesting packages"
+	},  
     "add-widget": {
       "title": "Ajouter un nouveau widget",
       "getMore": "Obtenir des widgets",
-      "add": "Ajouter",
-      "goBack": "Retour",
       "errorDuringCreatingWidget": "Erreur à la création du widget",
       "widgetSuccessfullyCreated": "Widget créé",
-      "unableToCreateWidgetOfType": "Impossible de créer le widget du type __widgetType__",
-      "descriptionHeader": "Description:",
-      "versionHeader": "Version:",
-      "authorHeader": "Auteur:"
+      "unableToCreateWidgetOfType": "Impossible de créer le widget du type __widgetType__"
     },
     "configure-widget": {
       "title": "Configuration du widget",
@@ -452,6 +455,7 @@
           "ruleDeletionError": "Impossible de supprimer la règle __rule__.",
           "ruleStopError": "Impossible d'arrêter la règle __rule__.",
           "ruleStartError": "Impossible de démarrer la règle __rule__.",
+		  "pluginListingError": "Impossible de lister les plugins.",
           "ruleListingError": "Impossible de lister les règles.",
           "ruleInterpreterListingError": "Impossible de lister les interpréteurs de règles.",
           "ruleGetLogError": "Impossible d'obtenir le log de la règle __rule__.",

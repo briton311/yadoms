@@ -15,7 +15,8 @@ CForecastDays::CForecastDays(boost::shared_ptr<yApi::IYPluginApi> api,
      m_forecast(boost::make_shared<CForecast>(deviceName, "Forecast", weatherunderground::helper::EPeriod::kDay)),
      m_temp(boost::make_shared<yApi::historization::CTemperature>(prefix + "low_temperature")),
      m_isDesactivated(false),
-     m_isUserDesactivated(false)
+     m_isUserDesactivated(false),
+     m_isDeveloperMode(false)
 {
    try
    {
@@ -149,8 +150,7 @@ void CForecastDays::parse(boost::shared_ptr<yApi::IYPluginApi> api,
       }
       catch (shared::exception::CException& e)
       {
-         std::cout << "Error during the parsing of the element ! : " << e.what() << std::endl;
-         throw;
+         std::cout << "Error during parsing the element ! : " << e.what() << std::endl;
       }
    }
 }
