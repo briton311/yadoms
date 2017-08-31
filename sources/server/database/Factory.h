@@ -27,6 +27,12 @@ namespace database
       /// \param[in] pathProvider   The application path provider
       //--------------------------------------------------------------
       static boost::shared_ptr<IDatabaseRequester> createEngine(const IPathProvider& pathProvider);
+
+      //--------------------------------------------------------------
+      /// \Brief		   Create the PostgreSQL requester
+      /// \return       The PostgreSQL requester
+      //--------------------------------------------------------------
+      static boost::shared_ptr<IDatabaseRequester> createPqsqlRequester();
    };
 } //namespace database 
 
