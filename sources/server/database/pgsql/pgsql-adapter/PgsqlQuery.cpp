@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "PgsqlQuery.h"
 
-namespace database { namespace pgsql { 
-
+namespace libPgsqlAdapter
+{
    CPgsqlQuery::CPgsqlQuery()
-      :common::CQuery(true)
+      : CQuery(true)
    {
    }
 
@@ -12,16 +12,16 @@ namespace database { namespace pgsql {
    {
    }
 
-   CPgsqlQuery & CPgsqlQuery::SelectExists(common::CQuery & subQuery)
+   CPgsqlQuery& CPgsqlQuery::SelectExists(CQuery& subQuery)
    {
       ChangeQueryType(kSelect);
       std::ostringstream ss;
       ss << "SELECT EXISTS( " << subQuery.str() << ") ";
-      Append(ss); 
+      Append(ss);
       return *this;
    }
 
-   CPgsqlQuery & CPgsqlQuery::CreateDatabase(const std::string & name)
+   CPgsqlQuery& CPgsqlQuery::CreateDatabase(const std::string& name)
    {
       ChangeQueryType(kCreate);
       std::ostringstream ss;
@@ -30,13 +30,10 @@ namespace database { namespace pgsql {
       return *this;
    }
 
-   std::string CPgsqlQuery::functionDateToIsoString(const std::string &sqlPart)
+   std::string CPgsqlQuery::functionDateToIsoString(const std::string& sqlPart)
    {
       return (boost::format("to_char(%1%, 'YYYY\"-\"MM\"-\"DD\"T\"HH24\":\"MI\":\"SS')") % sqlPart).str();
    }
+} //namespace libPgsqlAdapter 
 
-
-
-} //namespace pgsql
-} //namespace database 
 

@@ -4,9 +4,10 @@
 #include "startupOptions/IStartupOptions.h"
 #include "common/DataProvider.h"
 #include "sqlite/SQLiteRequester.h"
+#include <shared/Log.h>
 
 #ifndef PGSQL_NOT_FOUND
-#  include "pgsql/PgsqlRequester.h"
+#  include <boost/dll.hpp>
 #endif
 
 namespace database
@@ -36,7 +37,17 @@ namespace database
 
    boost::shared_ptr<IDatabaseRequester> CFactory::createPqsqlRequester()
    {
-      return boost::make_shared<pgsql::CPgsqlRequester>();
+      try
+      {
+         return boost::dll::import<IDatabaseRequester>("lib-pgsql-adapter",
+                                                       "PgsqlRequester",
+                                                       boost::dll::load_mode::append_decorations);
+      }
+      catch (std::exception& e)
+      {
+         YADOMS_LOG(error) << "Unable to load lib-pgsql-adapter library, " << e.what();
+         throw;
+      }
    }
 } //namespace database 
 

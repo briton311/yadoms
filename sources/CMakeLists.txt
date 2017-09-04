@@ -226,7 +226,15 @@ endif()
 # define libraries to link with
 #
 ###############################################
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${Poco_FOUND_LIBS} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${Protobuf_LIBRARIES})
+set(LIBS
+   ${LIBS}
+   ${Boost_LIBRARIES}
+   ${CMAKE_THREAD_LIBS_INIT}
+   ${Poco_FOUND_LIBS}
+   ${OPENSSL_SSL_LIBRARY}
+   ${OPENSSL_CRYPTO_LIBRARY}
+   ${Protobuf_LIBRARIES}
+   )
 
 ##################################################################################################
 ## Internal libraries (SQlite, Webem) completely build from sources
@@ -792,69 +800,10 @@ IF(USE_SQLITE_DATABASE)
 	set(YADOMS_INCL_DIR ${YADOMS_INCL_DIR} ${SQLITE_INCLUDE_DIRECTORY})
 ENDIF()
 
+
 ################################################
-#### Database (PostgreSQL)
+#### Web server
 ################################################
-
-IF(USE_PGSQL_DATABASE)
-   find_package(PostgreSQL)
-
-   if(PostgreSQL_FOUND)
-      message(STATUS "Found postgresql ${PostgreSQL_VERSION_STRING}")
-
-      set(YADOMS_SRC ${YADOMS_SRC}
-			server/database/pgsql/PgsqlQuery.h
-			server/database/pgsql/PgsqlQuery.cpp
-			server/database/pgsql/PgsqlRequester.h
-			server/database/pgsql/PgsqlRequester.cpp
-			server/database/pgsql/PgsqlResultHandler.h
-			server/database/pgsql/PgsqlResultHandler.cpp
-			server/database/pgsql/PgsqlSqlState.h
-			server/database/pgsql/PgsqlSqlState.cpp
-			server/database/pgsql/PgsqlSystemTables.h
-			server/database/pgsql/PgsqlSystemTables.cpp
-			server/database/pgsql/PgsqlTableCreationScriptProvider.h
-			server/database/pgsql/PgsqlTableCreationScriptProvider.cpp
-      )
-      
-      source_group(server\\database\\pgsql  server/database/pgsql/*.*)
-	
-      IF(WIN32)
-         #add PostgreSQL as dependencies
-         IF(EXISTS "${PostgreSQL_ROOT}/bin/libpq.dll")
-            SET(PostgreSqlDepends "${PostgreSQL_ROOT}/bin/libpq.dll")
-         ENDIF()
-         
-         IF(EXISTS "${PostgreSQL_ROOT}/bin/ssleay32.dll")
-            SET(PostgreSqlDepends ${PostgreSqlDepends} "${PostgreSQL_ROOT}/bin/ssleay32.dll")
-         ENDIF()
-         
-         IF(EXISTS "${PostgreSQL_ROOT}/bin/libeay32.dll")
-            SET(PostgreSqlDepends ${PostgreSqlDepends} "${PostgreSQL_ROOT}/bin/libeay32.dll")
-         ENDIF()
-
-         IF(EXISTS "${PostgreSQL_ROOT}/bin/intl.dll")
-            SET(PostgreSqlDepends ${PostgreSqlDepends} "${PostgreSQL_ROOT}/bin/intl.dll")
-         ENDIF()
-
-         IF(EXISTS "${PostgreSQL_ROOT}/bin/libintl-8.dll")
-            SET(PostgreSqlDepends ${PostgreSqlDepends} "${PostgreSQL_ROOT}/bin/libintl-8.dll")
-         ENDIF()
-
-         IF(EXISTS "${PostgreSQL_ROOT}/bin/libiconv-2.dll")
-            SET(PostgreSqlDepends ${PostgreSqlDepends} "${PostgreSQL_ROOT}/bin/libiconv-2.dll")
-         ENDIF()
-      ENDIF(WIN32)
-   
-      set(YADOMS_EXTERNAL_LINK ${YADOMS_EXTERNAL_LINK} ${PostgreSQL_LIBRARY})
-      set(YADOMS_INCL_DIR ${YADOMS_INCL_DIR} ${PostgreSQL_INCLUDE_DIRS})
-   else()
-      message(WARNING "PostgreSQL not found. Only SQLite will be available")
-      add_definitions( -DPGSQL_NOT_FOUND )
-   ENDIF(PostgreSQL_FOUND)   
-ENDIF(USE_PGSQL_DATABASE)
-
-#Web server
 IF(USE_POCO_WEBSERVER)
 	set(YADOMS_SRC ${YADOMS_SRC}
 		server/web/poco/WebServer.h
@@ -935,6 +884,12 @@ ELSE()
 	set(SHARED_INCL_DIR ${SHARED_INCL_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/shared/linux)
 ENDIF()
 
+
+
+################################################
+## Database (PostgreSQL)
+################################################
+add_subdirectory(server/database/pgsql/pgsql-adapter)
 
 
 ##################################################################################################
@@ -1083,22 +1038,6 @@ FOREACH (PocoNetSSLDepends ${PocoNetSSLDepends})
   endif(COTIRE_USE)                          
 ENDFOREACH(PocoNetSSLDepends)
 
-#copy PostgreSql depends
-FOREACH (PostgreSqlDepend ${PostgreSqlDepends})
-   add_custom_command(TARGET yadoms POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                          ${PostgreSqlDepend} $<TARGET_FILE_DIR:yadoms>/)
-
-  if(COTIRE_USE)   
-     if(COTIRE_USE_UNITY)
-        add_custom_command(TARGET yadoms_unity POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                               ${PostgreSqlDepend} $<TARGET_FILE_DIR:yadoms_unity>/)
-     endif(COTIRE_USE_UNITY)
-  endif(COTIRE_USE)                          
-                          
-ENDFOREACH(PostgreSqlDepend)
-
 
 #copy www directory into build directory
 add_custom_command(TARGET yadoms POST_BUILD
@@ -1133,6 +1072,7 @@ endif()
    
 
 #add depends
+# TODO revoir si encore d'actualité
 FOREACH (PostgreSqlDepend ${PostgreSqlDepends})
    if (DEFINED CMAKE_CONFIGURATION_TYPES)
       install(FILES ${PostgreSqlDepend} CONFIGURATIONS Debug;Release;RelWithDebInfo;MinSizeRel RUNTIME DESTINATION ${INSTALL_BINDIR})

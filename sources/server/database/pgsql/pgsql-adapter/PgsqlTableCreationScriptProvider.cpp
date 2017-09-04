@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "PgsqlTableCreationScriptProvider.h"
 
-namespace database { namespace pgsql {
-
-
+namespace libPgsqlAdapter
+{
    CPgsqlTableCreationScriptProvider::CPgsqlTableCreationScriptProvider()
    {
    }
@@ -41,7 +40,7 @@ namespace database { namespace pgsql {
 
    std::string CPgsqlTableCreationScriptProvider::getTablePlugin()
    {
-      return  "CREATE TABLE Plugin                                               \
+      return "CREATE TABLE Plugin                                               \
                (  id SERIAL NOT NULL PRIMARY KEY,                                \
                   displayName TEXT NOT NULL,                                     \
                   type TEXT NOT NULL,                                            \
@@ -177,14 +176,13 @@ namespace database { namespace pgsql {
                   PRIMARY KEY (idRecipient, pluginType, fieldName))";
    }
 
-   void CPgsqlTableCreationScriptProvider::getTableAcquisitionIndexes(std::vector<std::string> & indexScripts)
+   void CPgsqlTableCreationScriptProvider::getTableAcquisitionIndexes(std::vector<std::string>& indexScripts)
    {
       indexScripts.clear();
       //TODO : créer les index pour pgsql
       //indexScripts.push_back("CREATE INDEX acqKeywordIdIndex ON Acquisition(keywordId)");
       //indexScripts.push_back("create index if not exists acqKeywordIdDateIndex on Acquisition(keywordId,date)");
    }
+} //namespace libPgsqlAdapter 
 
 
-} //namespace pgsql
-} //namespace database 

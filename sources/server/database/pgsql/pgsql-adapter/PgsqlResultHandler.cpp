@@ -6,10 +6,10 @@
 #include <Poco/ByteOrder.h>
 
 
-namespace database { namespace pgsql {
-
-   CPgsqlResultHandler::CPgsqlResultHandler(PGresult *res)
-      :m_res(res)
+namespace libPgsqlAdapter
+{
+   CPgsqlResultHandler::CPgsqlResultHandler(PGresult* res)
+      : m_res(res)
    {
       m_currentResultIndex = -1;
       m_currentResultRowCount = PQntuples(m_res);
@@ -17,7 +17,6 @@ namespace database { namespace pgsql {
 
    CPgsqlResultHandler::~CPgsqlResultHandler()
    {
-
    }
 
    // database::common::IResultHandler implementation
@@ -44,23 +43,23 @@ namespace database { namespace pgsql {
 
    int CPgsqlResultHandler::extractValueAsInt(const int columnIndex)
    {
-      char * valuePoint = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
-      int result = 0;
+      auto valuePoint = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
+      int result;
       if (PQbinaryTuples(m_res) == 1)
       {
-         int nbBytes = PQfsize(m_res, columnIndex);
+         auto nbBytes = PQfsize(m_res, columnIndex);
 
          switch (nbBytes)
          {
          case 8:
-            result = (int)Poco::ByteOrder::fromNetwork(*((Poco::Int64 *)valuePoint));
+            result = static_cast<int>(Poco::ByteOrder::fromNetwork(*reinterpret_cast<Poco::Int64 *>(valuePoint)));
             break;
          default:
          case 4:
-            result = Poco::ByteOrder::fromNetwork(*((Poco::Int32 *)valuePoint));
+            result = Poco::ByteOrder::fromNetwork(*reinterpret_cast<Poco::Int32 *>(valuePoint));
             break;
          case 2:
-            result = Poco::ByteOrder::fromNetwork(*((Poco::Int16 *)valuePoint));
+            result = Poco::ByteOrder::fromNetwork(*reinterpret_cast<Poco::Int16 *>(valuePoint));
             break;
          }
       }
@@ -73,36 +72,36 @@ namespace database { namespace pgsql {
 
    float CPgsqlResultHandler::extractValueAsFloat(const int columnIndex)
    {
-      char * valuePointer = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
+      auto valuePointer = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
       union
       {
          float result;
          Poco::UInt32 raw;
       } conv;
-      conv.raw = Poco::ByteOrder::fromNetwork(*((Poco::UInt32 *)valuePointer));
+      conv.raw = Poco::ByteOrder::fromNetwork(*reinterpret_cast<Poco::UInt32 *>(valuePointer));
       return conv.result;
    }
 
    double CPgsqlResultHandler::extractValueAsDouble(const int columnIndex)
    {
-      char * valuePointer = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
+      auto valuePointer = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
       union
       {
          double result;
          Poco::UInt64 raw;
       } conv;
-      conv.raw = Poco::ByteOrder::fromNetwork(*((Poco::UInt64 *)valuePointer));
+      conv.raw = Poco::ByteOrder::fromNetwork(*reinterpret_cast<Poco::UInt64 *>(valuePointer));
       return conv.result;
    }
 
    unsigned char* CPgsqlResultHandler::extractValueAsBlob(const int columnIndex)
    {
-      return (unsigned char*)PQgetvalue(m_res, m_currentResultIndex, columnIndex);
+      return reinterpret_cast<unsigned char*>(PQgetvalue(m_res, m_currentResultIndex, columnIndex));
    }
 
    bool CPgsqlResultHandler::extractValueAsBool(const int columnIndex)
    {
-      char * valuePoint = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
+      auto valuePoint = PQgetvalue(m_res, m_currentResultIndex, columnIndex);
       return valuePoint[0] == 't' || valuePoint[0] == '1';
    }
 
@@ -126,8 +125,6 @@ namespace database { namespace pgsql {
    {
       return shared::CDataContainer(extractValueAsString(columnIndex));
    }
+} //namespace libPgsqlAdapter 
 
-
-} //namespace sqlite
-} //namespace database 
 

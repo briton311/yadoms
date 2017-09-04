@@ -3,10 +3,9 @@
 #include "database/common/DatabaseTablesHelpers.hpp"
 
 
-namespace database { 
-namespace pgsql { 
-
-   DECLARE_TABLE(PgsqlTables, 
+namespace libPgsqlAdapter
+{
+   DECLARE_TABLE(PgsqlTables,
       (Database)
       (Schema)
       (Table)
@@ -24,7 +23,6 @@ namespace pgsql {
    DECLARE_TABLE(PgDatabase,
       (DatabaseName)
    )
+} //namespace libPgsqlAdapter 
 
-} //namespace pgsql
-} //namespace database 
 

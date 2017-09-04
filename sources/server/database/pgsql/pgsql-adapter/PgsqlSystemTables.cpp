@@ -2,9 +2,8 @@
 #include "PgsqlSystemTables.h"
 
 
-namespace database { 
-namespace pgsql { 
-
+namespace libPgsqlAdapter
+{
    DECLARE_TABLE_COLUMN_NAMES(PgsqlTables, "information_schema.tables",
       ((Database)("table_catalog"))
       ((Schema)("table_schema"))
@@ -23,8 +22,6 @@ namespace pgsql {
    DECLARE_TABLE_COLUMN_NAMES(PgDatabase, "pg_catalog.pg_database",
       ((DatabaseName)("datname"))
    )
+} //namespace libPgsqlAdapter 
 
-
-} //namespace pgsql
-} //namespace database 
 

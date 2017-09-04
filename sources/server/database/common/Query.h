@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Poco/Types.h>
-#include <Poco/DateTime.h>
-#include <Poco/Timestamp.h>
 #include <shared/enumeration/IExtendedEnum.h> 
 #include <shared/Field.hpp>
 #include "database/DatabaseException.hpp"
@@ -706,16 +703,18 @@ namespace database
          };
 
          //--------------------------------------------------------------
-         ///\brief	generate min function ( ie: min(field0) )
-         ///\param [in]	field    The field or query
+         ///\brief	generate math function
+         ///\param [in]	value    The first operand
+         ///\param [in]	op       The operator
+         ///\param [in]	value2   The second operand
          ///\return The query function
          //--------------------------------------------------------------
          template <class T1, class T2>
          inline const CFunction math(const T1& value, const std::string& op, const T2& value2);
 
          //--------------------------------------------------------------
-         ///\brief	generate min function ( ie: min(field0) )
-         ///\param [in]	field    The field or query
+         ///\brief	generate min function ( ie: min(value) )
+         ///\param [in]	value    The operand
          ///\return The query function
          //--------------------------------------------------------------
          template <class T>

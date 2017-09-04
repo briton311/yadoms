@@ -2,10 +2,9 @@
 
 #include <shared/enumeration/EnumHelpers.hpp>
 
-namespace database { 
-namespace pgsql { 
-
-   DECLARE_ENUM_HEADER(ESqlErrorClass, 
+namespace libPgsqlAdapter
+{
+   DECLARE_ENUM_HEADER(ESqlErrorClass,
       ((SuccessfulCompletion))
       ((Warning))
       ((NoData))
@@ -52,15 +51,15 @@ namespace pgsql {
    class CPgsqlSqlState
    {
    private:
-      explicit CPgsqlSqlState(const std::string & code, const std::string & description);
+      explicit CPgsqlSqlState(const std::string& code, const std::string& description);
 
    public:
-      static const CPgsqlSqlState & Parse(char * state);
+      static const CPgsqlSqlState& Parse(char* state);
 
       virtual ~CPgsqlSqlState();
 
-      const std::string & GetCode() const;
-      const std::string & GetDescription() const;
+      const std::string& GetCode() const;
+      const std::string& GetDescription() const;
       const ESqlErrorClass GetClass() const;
    private:
       std::string m_code;
@@ -69,8 +68,6 @@ namespace pgsql {
    private:
       static std::map<std::string, CPgsqlSqlState> m_internalCodes;
    };
+} //namespace libPgsqlAdapter
 
-
-} //namespace pgsql
-} //namespace database 
 

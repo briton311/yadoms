@@ -1,16 +1,16 @@
 #pragma once
 
-#include "../common/Query.h"
+#include "database/common/Query.h"
 
 
-namespace database { namespace pgsql { 
-
+namespace libPgsqlAdapter
+{
 #define CQUERY_OP_ILIKE " ILIKE "
 
    //
    /// \brief  Class used to create queries
    //
-   class CPgsqlQuery : public common::CQuery
+   class CPgsqlQuery : public database::common::CQuery
    {
    public:
       //
@@ -27,21 +27,19 @@ namespace database { namespace pgsql {
       /// \brief           Start a query with 'SELECT EXISTS(subquery)'
       /// \return          A reference to itself to allow method chaining
       //
-      CPgsqlQuery & SelectExists(common::CQuery & subQuery);
+      CPgsqlQuery& SelectExists(CQuery& subQuery);
 
       //
       /// \brief        Start a create databse query
       /// \param [in]   name  The database name to create
       /// \return       A reference to itself to allow method chaining
       //
-      CPgsqlQuery & CreateDatabase(const std::string & name);
+      CPgsqlQuery& CreateDatabase(const std::string& name);
 
       // Overriding common::CQuery
-      virtual std::string functionDateToIsoString(const std::string &sqlPart);
+      std::string functionDateToIsoString(const std::string& sqlPart) override;
       // [END] - Overriding common::CQuery 
    };
+} //namespace libPgsqlAdapter 
 
-
-} //namespace pgsql
-} //namespace database 
 
