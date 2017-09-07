@@ -1,4 +1,5 @@
 #pragma once
+#include "IDataBackupClientStrings.h"
 
 
 namespace dbCommon
@@ -22,10 +23,10 @@ namespace dbCommon
 
       //---------------------------------
       ///\brief Backup the data provider to a file
-      ///\param [in] reporter : a function pointer for reporting progression
+      ///\param [in] reporter Function pointer for reporting progression
+      ///\param [in] strings Strings ID to user interface when backuping
       //---------------------------------
-      virtual void backupData(ProgressFunc reporter) = 0;
-
+      virtual void backupData(ProgressFunc reporter, boost::shared_ptr<IDataBackupClientStrings> strings) = 0;
 
       //---------------------------------
       ///\brief Get the last backup file path

@@ -11,6 +11,7 @@ set(DBCOMMON_SRC
    dbCommon/DatabaseTablesHelpers.hpp
    dbCommon/DatabaseException.hpp
    dbCommon/IDataBackup.h
+   dbCommon/IDataBackupClientStrings.h
    dbCommon/IDatabaseEngine.h
    dbCommon/IDatabaseRequester.h
    dbCommon/IResultHandler.h

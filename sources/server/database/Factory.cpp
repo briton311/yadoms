@@ -2,7 +2,6 @@
 #include "Factory.h"
 #include "startupOptions/IStartupOptions.h"
 #include "common/DataProvider.h"
-#include "sqlite/SQLiteRequester.h"
 #include <shared/Log.h>
 #include <dbCommon/DatabaseException.hpp>
 
@@ -37,7 +36,9 @@ namespace database
    {
       try
       {
-         auto databaseRequester = boost::make_shared<sqlite::CSQLiteRequester>();
+         auto databaseRequester = boost::dll::import<dbCommon::IDatabaseRequester>("lib-sqlite-adapter",
+                                                                                   "SQLiteRequester",
+                                                                                   boost::dll::load_mode::append_decorations);
 
          databaseRequester->setOptions(buildSQLiteOptions(startupOptions));
 
@@ -45,7 +46,7 @@ namespace database
       }
       catch (std::exception& e)
       {
-         YADOMS_LOG(error) << "Unable to load lib-pgsql-adapter library, " << e.what();
+         YADOMS_LOG(error) << "Unable to load lib-sqlite-adapter library, " << e.what();
          throw;
       }
    }

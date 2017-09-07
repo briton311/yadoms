@@ -55,7 +55,7 @@ void CSupervisor::run()
       shared::CServiceLocator::instance().push<notification::CNotificationCenter>(notificationCenter);
 
       //retrieve startup options
-      auto startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
+      const auto startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
 
       //start database system
       auto pDataProvider = database::CFactory::create(startupOptions);

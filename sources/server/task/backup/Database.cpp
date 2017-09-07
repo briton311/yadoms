@@ -2,6 +2,7 @@
 #include <shared/exception/InvalidParameter.hpp>
 #include "task/ITask.h"
 #include "Database.h"
+#include <database/DataBackupClientStrings.h>
 
 namespace task
 {
@@ -35,8 +36,11 @@ namespace task
 
       void CDatabase::doWork(TaskProgressFunc pFunctor)
       {
+         static const auto strings = boost::make_shared<database::CDataBackupClientStrings>();
+
          m_reportRealProgress = pFunctor;
-         m_dataBackupInterface->backupData(boost::bind(&CDatabase::OnProgressionUpdatedInternal, this, _1, _2, _3));
+         m_dataBackupInterface->backupData(boost::bind(&CDatabase::OnProgressionUpdatedInternal, this, _1, _2, _3),
+                                           strings);
       }
    } //namespace backup
 } //namespace task

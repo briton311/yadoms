@@ -14,7 +14,7 @@ namespace database
          : m_acquisitionRequester(acquisitionRequester), m_sqlRequester(sqlRequester)
       {
          //retreive startup options
-         boost::shared_ptr<startupOptions::IStartupOptions> startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
+         const auto startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
 
          m_acquisitionLifetimeDays = startupOptions->getDatabaseAcquisitionLifetime();
       }

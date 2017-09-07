@@ -5,7 +5,8 @@
 #include <shared/versioning/Version.h>
 #include "VersionException.h"
 #include <shared/Log.h>
-#include "database/sqlite/SQLiteRequester.h"
+#include <shared/ServiceLocator.h>
+#include <startupOptions/IStartupOptions.h>
 
 namespace database
 {
@@ -49,7 +50,7 @@ namespace database
          ///\param [in] pRequester : database requester object
          ///\throw      CVersionException if create database failed
          //-----------------------------------
-         void CVersion_3_0_0::UpdateFrom2_0_0(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester) const
+         void CVersion_3_0_0::UpdateFrom2_0_0(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester)
          {
             try
             {
@@ -63,8 +64,11 @@ namespace database
                //column
                std::string tableScript;
                pRequester->dropTableIfExists(dbCommon::CPluginEventLoggerTable::getTableName());
-               if (boost::dynamic_pointer_cast<sqlite::CSQLiteRequester>(pRequester) != nullptr)
-                  tableScript = "CREATE TABLE PluginEventLogger                        \
+               const auto startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
+               switch (startupOptions->getDatabaseEngine())
+               {
+               case startupOptions::EDatabaseEngine::kSqliteValue:
+                  tableScript = "CREATE TABLE PluginEventLogger                  \
                            (  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,     \
                               eventDate  TEXT NOT NULL,                          \
                               pluginName TEXT NOT NULL,                          \
@@ -72,8 +76,10 @@ namespace database
                               eventType  TEXT DEFAULT \"unload\",                \
                               message  TEXT                                      \
                            )";
-               else
-                  tableScript = "CREATE TABLE PluginEventLogger                        \
+                  break;
+#ifndef PGSQL_NOT_FOUND
+               case startupOptions::EDatabaseEngine::kPostgresqlValue:
+                  tableScript = "CREATE TABLE PluginEventLogger                  \
                            (  id SERIAL NOT NULL PRIMARY KEY,                    \
                               eventDate  TEXT NOT NULL,                          \
                               pluginName TEXT NOT NULL,                          \
@@ -81,6 +87,11 @@ namespace database
                               eventType  TEXT DEFAULT 'unload',                  \
                               message  TEXT                                      \
                            )";
+                  break;
+#endif
+               default:
+                  throw dbCommon::CDatabaseException("Unsupported database engine");
+               }
 
                if (!pRequester->createTableIfNotExists(dbCommon::CPluginEventLoggerTable::getTableName(), tableScript))
                   throw CVersionException("Fail to create table PluginEventLogger");

@@ -373,6 +373,8 @@ set(YADOMS_SRC
    server/database/IConfigurationRequester.h
    server/database/IAcquisitionRequester.h
    server/database/IDataProvider.h
+   server/database/DataBackupClientStrings.h
+   server/database/DataBackupClientStrings.cpp
    server/database/Factory.h
    server/database/Factory.cpp
    server/database/IDeviceRequester.h
@@ -745,32 +747,6 @@ source_group(server\\database\\common  server/database/common/*.*)
 source_group(server\\database\\common\\requesters  server/database/common/requesters/*.*)
 source_group(server\\database\\common\\versioning  server/database/common/versioning/*.*)
 
-################################################
-#### Database (SQlite)
-################################################
-
-IF(USE_SQLITE_DATABASE)
-	set(YADOMS_SRC ${YADOMS_SRC}
-		server/database/sqlite/SQLiteQuery.h
-		server/database/sqlite/SQLiteQuery.cpp
-		server/database/sqlite/SQLiteOptions.h
-		server/database/sqlite/SQLiteOptions.cpp
-		server/database/sqlite/SQLiteRequester.h
-		server/database/sqlite/SQLiteRequester.cpp
-		server/database/sqlite/SQLiteResultHandler.h
-		server/database/sqlite/SQLiteResultHandler.cpp
-		server/database/sqlite/SQLiteSystemTables.h
-		server/database/sqlite/SQLiteSystemTables.cpp
-		server/database/sqlite/SQLiteTableCreationScriptProvider.h
-		server/database/sqlite/SQLiteTableCreationScriptProvider.cpp
-	)
-	
-	source_group(server\\database\\sqlite  server/database/sqlite/*.*)
-	
-	set(YADOMS_EXTERNAL_LINK ${YADOMS_EXTERNAL_LINK} sqlite)
-	set(YADOMS_INCL_DIR ${YADOMS_INCL_DIR} ${SQLITE_INCLUDE_DIRECTORY})
-ENDIF()
-
 
 ################################################
 #### Web server
@@ -865,6 +841,13 @@ add_subdirectory(dbCommon)
 
 
 ################################################
+## Database (SQLite)
+################################################
+add_subdirectory(sqlite-adapter)
+
+
+
+################################################
 ## Database (PostgreSQL)
 ################################################
 add_subdirectory(pgsql-adapter)
@@ -936,7 +919,6 @@ target_link_libraries(yadoms
    plugin_IPC
    interpreter_IPC
    script_IPC
-   ${YADOMS_EXTERNAL_LINK}
    ${LIBS}
    ${CMAKE_DL_LIBS}
 )

@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "SQLiteTableCreationScriptProvider.h"
 
-namespace database { namespace sqlite {
-
-
+namespace libSQLiteAdapter
+{
    CSQLiteTableCreationScriptProvider::CSQLiteTableCreationScriptProvider()
    {
    }
@@ -41,7 +40,7 @@ namespace database { namespace sqlite {
 
    std::string CSQLiteTableCreationScriptProvider::getTablePlugin()
    {
-      return  "CREATE TABLE Plugin                                               \
+      return "CREATE TABLE Plugin                                               \
                (  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                 \
                   displayName TEXT NOT NULL,                                     \
                   type TEXT NOT NULL,                                            \
@@ -176,12 +175,12 @@ namespace database { namespace sqlite {
                   PRIMARY KEY (idRecipient, pluginType, fieldName))";
    }
 
-   void CSQLiteTableCreationScriptProvider::getTableAcquisitionIndexes(std::vector<std::string> & indexScripts)
+   void CSQLiteTableCreationScriptProvider::getTableAcquisitionIndexes(std::vector<std::string>& indexScripts)
    {
       indexScripts.clear();
       indexScripts.push_back("CREATE INDEX acqKeywordIdIndex ON Acquisition(keywordId)");
       indexScripts.push_back("create index if not exists acqKeywordIdDateIndex on Acquisition(keywordId,date)");
    }
- 
-} //namespace sqlite
-} //namespace database 
+} //namespace libSQLiteAdapter
+
+

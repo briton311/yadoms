@@ -6,6 +6,7 @@
 #include "IDataBackup.h"
 #include "IDatabaseEngine.h"
 #include "ITableCreationScriptProvider.h"
+#include "IDataBackupClientStrings.h"
 
 namespace dbCommon
 {
@@ -132,7 +133,7 @@ namespace dbCommon
       // [END] ITransactionalProvider implementation
 
       // IDataBackup implementation
-      void backupData(ProgressFunc reporter) override = 0;
+      void backupData(ProgressFunc reporter, boost::shared_ptr<IDataBackupClientStrings> strings) override = 0;
       // [END] IDataBackup implementation
 
       // IDatabaseEngine implementation

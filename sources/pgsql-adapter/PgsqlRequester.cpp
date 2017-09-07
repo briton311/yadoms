@@ -609,7 +609,7 @@ namespace libPgsqlAdapter
       return false;
    }
 
-   void CPgsqlRequester::backupData(IDataBackup::ProgressFunc reporter)
+   void CPgsqlRequester::backupData(ProgressFunc reporter, boost::shared_ptr<dbCommon::IDataBackupClientStrings> strings)
    {
       throw dbCommon::CDatabaseException("Unsupported backup for PostgreSQL");
    }

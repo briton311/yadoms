@@ -180,7 +180,7 @@ namespace update {
             /////////////////////////////////////////////
             //2. remove scriptInterpreter folder
             /////////////////////////////////////////////
-            boost::shared_ptr<startupOptions::IStartupOptions> startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
+            const auto startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
             Poco::Path scriptInterpreterPath(startupOptions->getScriptInterpretersPath());
             scriptInterpreterPath.append(scriptInterpreterName);
 

@@ -46,7 +46,7 @@ namespace libPgsqlAdapter
 
       // dbCommon::IDataBackup implementation
       bool backupSupported() override;
-      void backupData(IDataBackup::ProgressFunc reporter) override;
+      void backupData(ProgressFunc reporter, boost::shared_ptr<dbCommon::IDataBackupClientStrings> strings) override;
       boost::filesystem::path lastBackupData() override;
       // [END] dbCommon::IDataBackup implementation
 
