@@ -5,6 +5,8 @@
 #include "DatabaseColumn.h"
 #include "DatabaseException.hpp"
 
+#include <Poco/Types.h>
+#include <Poco/DateTime.h>
 namespace dbCommon
 {
 #define EMPTY_STR ""

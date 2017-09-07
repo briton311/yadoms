@@ -33,8 +33,6 @@ if(USE_SQLITE_DATABASE)
       ${BOOST_INCL_DIR}
       ${Poco_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR})
-      
-      message("SQLITE_LIBRARIES=${SQLITE_LIBRARIES}")
 
    target_link_libraries(sqlite-adapter
       ${SQLITE_LIBRARIES}

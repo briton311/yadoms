@@ -46,7 +46,7 @@ namespace database
       }
       catch (std::exception& e)
       {
-         YADOMS_LOG(error) << "Unable to load lib-sqlite-adapter library, " << e.what();
+         YADOMS_LOG(error) << "Unable to load sqlite-adapter library, " << e.what();
          throw;
       }
    }
@@ -75,7 +75,7 @@ namespace database
       }
       catch (std::exception& e)
       {
-         YADOMS_LOG(error) << "Unable to load lib-pgsql-adapter library, " << e.what();
+         YADOMS_LOG(error) << "Unable to load pgsql-adapter library, " << e.what();
          throw;
       }
    }
