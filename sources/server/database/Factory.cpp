@@ -36,7 +36,7 @@ namespace database
    {
       try
       {
-         auto databaseRequester = boost::dll::import<dbCommon::IDatabaseRequester>("lib-sqlite-adapter",
+         auto databaseRequester = boost::dll::import<dbCommon::IDatabaseRequester>("sqlite-adapter",
                                                                                    "SQLiteRequester",
                                                                                    boost::dll::load_mode::append_decorations);
 
@@ -65,7 +65,7 @@ namespace database
    {
       try
       {
-         auto databaseRequester = boost::dll::import<dbCommon::IDatabaseRequester>("lib-pgsql-adapter",
+         auto databaseRequester = boost::dll::import<dbCommon::IDatabaseRequester>("pgsql-adapter",
                                                                                    "PgsqlRequester",
                                                                                    boost::dll::load_mode::append_decorations);
 
