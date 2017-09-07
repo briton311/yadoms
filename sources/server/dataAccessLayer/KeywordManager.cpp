@@ -42,42 +42,42 @@ namespace dataAccessLayer
       return true;
    }
 
-   boost::shared_ptr<database::entities::CKeyword> CKeywordManager::getKeyword(int deviceId, const std::string& keyword) const
+   boost::shared_ptr<dbCommon::entities::CKeyword> CKeywordManager::getKeyword(int deviceId, const std::string& keyword) const
    {
       return m_keywordRequester->getKeyword(deviceId, keyword);
    }
 
-   boost::shared_ptr<database::entities::CKeyword> CKeywordManager::getKeyword(int keywordId) const
+   boost::shared_ptr<dbCommon::entities::CKeyword> CKeywordManager::getKeyword(int keywordId) const
    {
       return m_keywordRequester->getKeyword(keywordId);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CKeyword>> CKeywordManager::getKeywordIdFromFriendlyName(int deviceId, const std::string& friendlyName) const
+   std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> CKeywordManager::getKeywordIdFromFriendlyName(int deviceId, const std::string& friendlyName) const
    {
       return m_keywordRequester->getKeywordIdFromFriendlyName(deviceId, friendlyName);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CKeyword>> CKeywordManager::getAllKeywords() const
+   std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> CKeywordManager::getAllKeywords() const
    {
       return m_keywordRequester->getAllKeywords();
    }
 
-   std::vector<boost::shared_ptr<database::entities::CKeyword>> CKeywordManager::getKeywords(int deviceId) const
+   std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> CKeywordManager::getKeywords(int deviceId) const
    {
       return m_keywordRequester->getKeywords(deviceId);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CKeyword>> CKeywordManager::getKeywordsMatchingCapacity(const std::string& capacity) const
+   std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> CKeywordManager::getKeywordsMatchingCapacity(const std::string& capacity) const
    {
       return m_keywordRequester->getKeywordsMatchingCapacity(capacity);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CKeyword>> CKeywordManager::getDeviceKeywordsWithCapacity(int deviceId, const std::string& capacityName, const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const
+   std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> CKeywordManager::getDeviceKeywordsWithCapacity(int deviceId, const std::string& capacityName, const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const
    {
       return m_keywordRequester->getDeviceKeywordsWithCapacity(deviceId, capacityName, capacityAccessMode);
    }
 
-   void CKeywordManager::addKeyword(const database::entities::CKeyword& newKeyword) const
+   void CKeywordManager::addKeyword(const dbCommon::entities::CKeyword& newKeyword) const
    {
       return m_keywordRequester->addKeyword(newKeyword);
    }
@@ -128,7 +128,7 @@ namespace dataAccessLayer
 
    void CKeywordManager::updateKeywordBlacklistState(int keywordId, const bool blacklist)
    {
-      if(blacklist)
+      if (blacklist)
          m_dataProvider->getAcquisitionRequester()->removeKeywordData(keywordId);
       m_keywordRequester->updateKeywordBlacklistState(keywordId, blacklist);
    }
@@ -144,11 +144,11 @@ namespace dataAccessLayer
 
    void CKeywordManager::removeKeyword(int keywordId)
    {
-     m_dataProvider->getAcquisitionRequester()->removeKeywordData(keywordId);
-     m_keywordRequester->removeKeyword(keywordId);
+      m_dataProvider->getAcquisitionRequester()->removeKeywordData(keywordId);
+      m_keywordRequester->removeKeyword(keywordId);
    }
 
-   boost::shared_ptr<database::entities::CKeyword> CKeywordManager::makeKeywordEntity(int deviceId, const shared::plugin::yPluginApi::historization::IHistorizable& keyword, const shared::CDataContainer& details)
+   boost::shared_ptr<dbCommon::entities::CKeyword> CKeywordManager::makeKeywordEntity(int deviceId, const shared::plugin::yPluginApi::historization::IHistorizable& keyword, const shared::CDataContainer& details)
    {
       // Validate keyword and capacity names. They must match URI pattern
       try
@@ -169,7 +169,7 @@ namespace dataAccessLayer
          throw shared::exception::COutOfRange("The keyword name does not match naming rules : " + ex.displayText());
       }
 
-      auto keywordEntity(boost::make_shared<database::entities::CKeyword>());
+      auto keywordEntity(boost::make_shared<dbCommon::entities::CKeyword>());
       keywordEntity->DeviceId = deviceId;
       keywordEntity->CapacityName = keyword.getCapacity().getName();
       keywordEntity->AccessMode = keyword.getAccessMode();

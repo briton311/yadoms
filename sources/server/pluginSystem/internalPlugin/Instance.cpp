@@ -8,7 +8,7 @@ namespace pluginSystem
 {
    namespace internalPlugin
    {
-      CInstance::CInstance(boost::shared_ptr<const database::entities::CPlugin> instanceInformation,
+      CInstance::CInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceInformation,
                            boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                            boost::shared_ptr<shared::plugin::yPluginApi::IYPluginApi> api,
                            boost::shared_ptr<CInstanceStateHandler> instanceStateHandler)
@@ -76,7 +76,7 @@ namespace pluginSystem
                                    newConfiguration);
       }
 
-      boost::shared_ptr<const database::entities::CPlugin> CInstance::about() const
+      boost::shared_ptr<const dbCommon::entities::CPlugin> CInstance::about() const
       {
          return m_instanceInformation;
       }

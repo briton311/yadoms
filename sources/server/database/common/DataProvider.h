@@ -1,6 +1,6 @@
 #pragma once
 #include "database/IDataProvider.h"
-#include "database/IDatabaseRequester.h"
+#include <dbCommon/IDatabaseRequester.h>
 #include "requesters/Plugin.h"
 #include "requesters/Configuration.h"
 #include "requesters/Device.h"
@@ -30,7 +30,7 @@ namespace database
          /// \Brief		   Constructor
          /// \param [in]	databaseRequester: The database engine
          //--------------------------------------------------------------
-         explicit CDataProvider(boost::shared_ptr<IDatabaseRequester> databaseRequester);
+         explicit CDataProvider(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester);
 
          //--------------------------------------------------------------
          /// \Brief		   Destructor
@@ -41,7 +41,7 @@ namespace database
          bool load() override;
          void unload() override;
          void stopMaintenanceTasks() override;
-         boost::shared_ptr<ITransactionalProvider> getTransactionalEngine() override;
+         boost::shared_ptr<dbCommon::ITransactionalProvider> getTransactionalEngine() override;
 
          boost::shared_ptr<IPluginRequester> getPluginRequester() override
          {
@@ -98,7 +98,7 @@ namespace database
             return m_recipientRequester;
          }
 
-         boost::shared_ptr<IDatabaseRequester> getDatabaseRequester() override
+         boost::shared_ptr<dbCommon::IDatabaseRequester> getDatabaseRequester() override
          {
             return m_databaseRequester;
          }
@@ -106,6 +106,7 @@ namespace database
          // [END] IDatabaseProvider implementation
 
          shared::versioning::CVersion GetVersion() const;
+
       private:
          //--------------------------------------------------------------
          /// \Brief		Load all requesters
@@ -186,7 +187,7 @@ namespace database
          //--------------------------------------------------------------
          /// \Brief		database requester
          //--------------------------------------------------------------
-         boost::shared_ptr<IDatabaseRequester> m_databaseRequester;
+         boost::shared_ptr<dbCommon::IDatabaseRequester> m_databaseRequester;
 
          //--------------------------------------------------------------
          /// \Brief		The maintenance timer

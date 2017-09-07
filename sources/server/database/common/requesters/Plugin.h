@@ -1,7 +1,7 @@
 #pragma once
 
 #include "database/IPluginRequester.h"
-#include "database/IDatabaseRequester.h"
+#include <dbCommon/IDatabaseRequester.h>
 
 namespace database
 {
@@ -19,7 +19,7 @@ namespace database
             /// \Brief		   Constructor
             /// \param [in]	pDatabaseHandler: the database handler
             //--------------------------------------------------------------
-            explicit CPlugin(boost::shared_ptr<IDatabaseRequester> databaseRequester);
+            explicit CPlugin(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester);
 
             //--------------------------------------------------------------
             /// \Brief		   Destructor
@@ -27,12 +27,12 @@ namespace database
             virtual ~CPlugin();
 
             // IPluginRequester implementation
-            int addInstance(const entities::CPlugin& newPlugin) override;
+            int addInstance(const dbCommon::entities::CPlugin& newPlugin) override;
             void removeInstance(int pluginId) override;
-            boost::shared_ptr<entities::CPlugin> getInstance(int pluginId) override;
-            boost::shared_ptr<entities::CPlugin> getSystemInstance() override;
-            std::vector<boost::shared_ptr<entities::CPlugin>> getInstances() override;
-            void updateInstance(const entities::CPlugin& newPlugin) override;
+            boost::shared_ptr<dbCommon::entities::CPlugin> getInstance(int pluginId) override;
+            boost::shared_ptr<dbCommon::entities::CPlugin> getSystemInstance() override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CPlugin>> getInstances() override;
+            void updateInstance(const dbCommon::entities::CPlugin& newPlugin) override;
             void disableAutoStartForAllPluginInstances(const std::string& pluginName) override;
             // [END] IPluginRequester implementation
 
@@ -40,7 +40,7 @@ namespace database
             //--------------------------------------------------------------
             /// \Brief		   Reference to IDatabaseRequester
             //--------------------------------------------------------------
-            boost::shared_ptr<IDatabaseRequester> m_databaseRequester;
+            boost::shared_ptr<dbCommon::IDatabaseRequester> m_databaseRequester;
          };
       } //namespace requesters
    } //namespace common

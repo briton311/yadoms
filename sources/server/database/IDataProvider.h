@@ -11,8 +11,8 @@
 #include "IRuleRequester.h"
 #include "IRecipientRequester.h"
 #include "IAcquisitionRequester.h"
-#include "ITransactionalProvider.h"
-#include "IDatabaseRequester.h"
+#include <dbCommon/ITransactionalProvider.h>
+#include <dbCommon/IDatabaseRequester.h>
 
 namespace database
 {
@@ -45,7 +45,7 @@ namespace database
       /// \return 	the transactional engine (can be NULL if transactional mode is not supported)
       /// \throws 		
       //--------------------------------------------------------------  
-      virtual boost::shared_ptr<ITransactionalProvider> getTransactionalEngine() = 0;
+      virtual boost::shared_ptr<dbCommon::ITransactionalProvider> getTransactionalEngine() = 0;
 
       //--------------------------------------------------------------
       /// \Brief		get the plugin requester
@@ -129,7 +129,7 @@ namespace database
       /// \return 	the Database requester
       /// \throws 		
       //--------------------------------------------------------------  
-      virtual boost::shared_ptr<IDatabaseRequester> getDatabaseRequester() = 0;
+      virtual boost::shared_ptr<dbCommon::IDatabaseRequester> getDatabaseRequester() = 0;
    };
 } //namespace database 
 

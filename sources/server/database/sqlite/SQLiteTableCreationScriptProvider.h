@@ -1,40 +1,43 @@
 #pragma once
 
-#include "database/ITableCreationScriptProvider.h"
+#include <dbCommon/ITableCreationScriptProvider.h>
 
 
-namespace database { namespace sqlite {
-
-   class CSQLiteTableCreationScriptProvider : public ITableCreationScriptProvider
+namespace database
+{
+   namespace sqlite
    {
-   public:
-      //--------------------------------------------------------------
-      /// \brief       Constructor
-      //--------------------------------------------------------------
-      CSQLiteTableCreationScriptProvider();
+      class CSQLiteTableCreationScriptProvider : public dbCommon::ITableCreationScriptProvider
+      {
+      public:
+         //--------------------------------------------------------------
+         /// \brief       Constructor
+         //--------------------------------------------------------------
+         CSQLiteTableCreationScriptProvider();
 
-      //--------------------------------------------------------------
-      /// \brief       Destructor
-      //--------------------------------------------------------------
-      virtual ~CSQLiteTableCreationScriptProvider();
+         //--------------------------------------------------------------
+         /// \brief       Destructor
+         //--------------------------------------------------------------
+         virtual ~CSQLiteTableCreationScriptProvider();
 
-      // ITableCreationScriptProvider implementation
-      virtual std::string getTableConfiguration();
-      virtual std::string getTableDevice();
-      virtual std::string getTablePlugin();
-      virtual std::string getTableKeyword();
-      virtual std::string getTablePage();
-      virtual std::string getTableWidget();
-      virtual std::string getTablePluginEventLogger();
-      virtual std::string getTableEventLogger();
-      virtual std::string getTableAcquisition();
-      virtual std::string getTableAcquisitionSummary();
-      virtual std::string getTableRule();
-      virtual std::string getTableRecipient();
-      virtual std::string getTableRecipientField();
-      virtual void getTableAcquisitionIndexes(std::vector<std::string> & indexScripts);
-      // [END] ITableCreationScriptProvider implementation
-   };
- 
-} //namespace sqlite
+         // dbCommon::ITableCreationScriptProvider implementation
+         std::string getTableConfiguration() override;
+         std::string getTableDevice() override;
+         std::string getTablePlugin() override;
+         std::string getTableKeyword() override;
+         std::string getTablePage() override;
+         std::string getTableWidget() override;
+         std::string getTablePluginEventLogger() override;
+         std::string getTableEventLogger() override;
+         std::string getTableAcquisition() override;
+         std::string getTableAcquisitionSummary() override;
+         std::string getTableRule() override;
+         std::string getTableRecipient() override;
+         std::string getTableRecipientField() override;
+         void getTableAcquisitionIndexes(std::vector<std::string>& indexScripts) override;
+         // [END] dbCommon::ITableCreationScriptProvider implementation
+      };
+   } //namespace sqlite
 } //namespace database 
+
+

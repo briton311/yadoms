@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Device.h"
 #include <shared/exception/EmptyResult.hpp>
-#include "database/common/adapters/DatabaseAdapters.h"
-#include "database/common/adapters/SingleValueAdapter.hpp"
-#include "database/common/DatabaseTables.h"
-#include "database/common/Query.h"
+#include <dbCommon/adapters/DatabaseAdapters.h>
+#include <dbCommon/adapters/SingleValueAdapter.hpp>
+#include <dbCommon/DatabaseTables.h>
+#include <dbCommon/Query.h>
 
 
 namespace database
@@ -13,7 +13,7 @@ namespace database
    {
       namespace requesters
       {
-         CDevice::CDevice(boost::shared_ptr<IDatabaseRequester> databaseRequester)
+         CDevice::CDevice(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester)
             : m_databaseRequester(databaseRequester)
          {
          }
@@ -48,21 +48,21 @@ namespace database
             return true;
          }
 
-         boost::shared_ptr<entities::CDevice> CDevice::getDevice(int deviceId, bool blacklistedIncluded) const
+         boost::shared_ptr<dbCommon::entities::CDevice> CDevice::getDevice(int deviceId, bool blacklistedIncluded) const
          {
             auto qSelect = m_databaseRequester->newQuery();
 
             if (blacklistedIncluded)
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
             else
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId).
-                      And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId).
+                      And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             if (adapter.getResults().empty())
                throw shared::exception::CEmptyResult((boost::format("Cannot retrieve Device Id=%1% in database") % deviceId).str());
@@ -70,24 +70,24 @@ namespace database
             return adapter.getResults()[0];
          }
 
-         boost::shared_ptr<entities::CDevice> CDevice::getDeviceInPlugin(int pluginId, const std::string& name, bool blacklistedIncluded) const
+         boost::shared_ptr<dbCommon::entities::CDevice> CDevice::getDeviceInPlugin(int pluginId, const std::string& name, bool blacklistedIncluded) const
          {
             //search for such a device
             auto qSelect = m_databaseRequester->newQuery();
 
             if (blacklistedIncluded)
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
-                      And(CDeviceTable::getNameColumnName(), CQUERY_OP_EQUAL, name);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
+                      And(dbCommon::CDeviceTable::getNameColumnName(), CQUERY_OP_EQUAL, name);
             else
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
-                      And(CDeviceTable::getNameColumnName(), CQUERY_OP_EQUAL, name).
-                      And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
+                      And(dbCommon::CDeviceTable::getNameColumnName(), CQUERY_OP_EQUAL, name).
+                      And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             if (adapter.getResults().empty())
                throw shared::exception::CEmptyResult((boost::format("Cannot retrieve Device Id=%1% in database") % name).str());
@@ -95,92 +95,92 @@ namespace database
             return adapter.getResults()[0];
          }
 
-         std::vector<boost::shared_ptr<entities::CDevice>> CDevice::getDevicesIdFromFriendlyName(const std::string& friendlyName) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDevice::getDevicesIdFromFriendlyName(const std::string& friendlyName) const
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CDeviceTable::getTableName()).
-                   Where(CDeviceTable::getFriendlyNameColumnName(), CQUERY_OP_EQUAL, friendlyName).
-                   And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                   From(dbCommon::CDeviceTable::getTableName()).
+                   Where(dbCommon::CDeviceTable::getFriendlyNameColumnName(), CQUERY_OP_EQUAL, friendlyName).
+                   And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
 
-         std::vector<boost::shared_ptr<entities::CDevice>> CDevice::getDeviceWithCapacity(const std::string& capacityName, const shared::plugin::yPluginApi::EKeywordAccessMode& accessMode) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDevice::getDeviceWithCapacity(const std::string& capacityName, const shared::plugin::yPluginApi::EKeywordAccessMode& accessMode) const
          {
             auto subQuery = m_databaseRequester->newQuery();
-            subQuery.Select(CKeywordTable::getDeviceIdColumnName()).
-                    From(CKeywordTable::getTableName()).
-                    Where(CKeywordTable::getCapacityNameColumnName(), CQUERY_OP_EQUAL, capacityName);
+            subQuery.Select(dbCommon::CKeywordTable::getDeviceIdColumnName()).
+                    From(dbCommon::CKeywordTable::getTableName()).
+                    Where(dbCommon::CKeywordTable::getCapacityNameColumnName(), CQUERY_OP_EQUAL, capacityName);
 
             if (accessMode() == shared::plugin::yPluginApi::EKeywordAccessMode::kGetSet)
             {
                //we add a constraint on accessmode
-               subQuery.And(CKeywordTable::getAccessModeColumnName(), CQUERY_OP_EQUAL, accessMode);
+               subQuery.And(dbCommon::CKeywordTable::getAccessModeColumnName(), CQUERY_OP_EQUAL, accessMode);
             }
 
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CDeviceTable::getTableName()).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_IN, subQuery).
-                   And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                   From(dbCommon::CDeviceTable::getTableName()).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_IN, subQuery).
+                   And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
 
-         std::vector<boost::shared_ptr<entities::CDevice>> CDevice::getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode, const shared::plugin::yPluginApi::EKeywordDataType& capacityType) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDevice::getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode, const shared::plugin::yPluginApi::EKeywordDataType& capacityType) const
          {
             auto subQuery = m_databaseRequester->newQuery();
-            subQuery.Select(CKeywordTable::getDeviceIdColumnName()).
-                    From(CKeywordTable::getTableName()).
-                    Where(CKeywordTable::getTypeColumnName(), CQUERY_OP_EQUAL, capacityType);
+            subQuery.Select(dbCommon::CKeywordTable::getDeviceIdColumnName()).
+                    From(dbCommon::CKeywordTable::getTableName()).
+                    Where(dbCommon::CKeywordTable::getTypeColumnName(), CQUERY_OP_EQUAL, capacityType);
 
             if (capacityAccessMode() == shared::plugin::yPluginApi::EKeywordAccessMode::kGetSet)
             {
                //we add a constraint on accessmode
-               subQuery.And(CKeywordTable::getAccessModeColumnName(), CQUERY_OP_EQUAL, capacityAccessMode);
+               subQuery.And(dbCommon::CKeywordTable::getAccessModeColumnName(), CQUERY_OP_EQUAL, capacityAccessMode);
             }
 
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CDeviceTable::getTableName()).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_IN, subQuery).
-                   And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                   From(dbCommon::CDeviceTable::getTableName()).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_IN, subQuery).
+                   And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
 
 
-         std::vector<boost::shared_ptr<entities::CDevice>> CDevice::getDeviceWithKeywordAccessMode(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDevice::getDeviceWithKeywordAccessMode(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const
          {
             auto subQuery = m_databaseRequester->newQuery();
-            subQuery.Select(CKeywordTable::getDeviceIdColumnName()).
-               From(CKeywordTable::getTableName());
+            subQuery.Select(dbCommon::CKeywordTable::getDeviceIdColumnName()).
+                    From(dbCommon::CKeywordTable::getTableName());
 
             if (capacityAccessMode() == shared::plugin::yPluginApi::EKeywordAccessMode::kGetSet)
             {
                //we add a constraint on accessmode
-               subQuery.Where(CKeywordTable::getAccessModeColumnName(), CQUERY_OP_EQUAL, capacityAccessMode);
+               subQuery.Where(dbCommon::CKeywordTable::getAccessModeColumnName(), CQUERY_OP_EQUAL, capacityAccessMode);
             }
 
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-               From(CDeviceTable::getTableName()).
-               Where(CDeviceTable::getIdColumnName(), CQUERY_OP_IN, subQuery).
-               And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                   From(dbCommon::CDeviceTable::getTableName()).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_IN, subQuery).
+                   And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
 
-         boost::shared_ptr<entities::CDevice> CDevice::createDevice(int pluginId, const std::string& name, const std::string& friendlyName, const std::string& type, const std::string& model, const shared::CDataContainer& details)
+         boost::shared_ptr<dbCommon::entities::CDevice> CDevice::createDevice(int pluginId, const std::string& name, const std::string& friendlyName, const std::string& type, const std::string& model, const shared::CDataContainer& details)
          {
             if (deviceExists(pluginId, name))
                throw shared::exception::CEmptyResult("The device already exists, cannot create it a new time");
@@ -194,13 +194,13 @@ namespace database
 
             //insert in db
             auto qInsert = m_databaseRequester->newQuery();
-            qInsert.InsertInto(CDeviceTable::getTableName(),
-                               CDeviceTable::getPluginIdColumnName(),
-                               CDeviceTable::getNameColumnName(),
-                               CDeviceTable::getFriendlyNameColumnName(),
-                               CDeviceTable::getTypeColumnName(),
-                               CDeviceTable::getModelColumnName(),
-                               CDeviceTable::getDetailsColumnName()).
+            qInsert.InsertInto(dbCommon::CDeviceTable::getTableName(),
+                               dbCommon::CDeviceTable::getPluginIdColumnName(),
+                               dbCommon::CDeviceTable::getNameColumnName(),
+                               dbCommon::CDeviceTable::getFriendlyNameColumnName(),
+                               dbCommon::CDeviceTable::getTypeColumnName(),
+                               dbCommon::CDeviceTable::getModelColumnName(),
+                               dbCommon::CDeviceTable::getDetailsColumnName()).
                    Values(pluginId,
                           name,
                           realFriendlyName,
@@ -230,9 +230,9 @@ namespace database
             {
                //insert in db
                auto qUpdate = m_databaseRequester->newQuery();
-               qUpdate.Update(CDeviceTable::getTableName()).
-                      Set(CDeviceTable::getFriendlyNameColumnName(), newFriendlyName).
-                      Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+               qUpdate.Update(dbCommon::CDeviceTable::getTableName()).
+                      Set(dbCommon::CDeviceTable::getFriendlyNameColumnName(), newFriendlyName).
+                      Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
 
                if (m_databaseRequester->queryStatement(qUpdate) <= 0)
                   throw shared::exception::CEmptyResult("Fail to update device friendlyName");
@@ -245,9 +245,9 @@ namespace database
                throw shared::exception::CEmptyResult("The device does not exists");
 
             auto qUpdate = m_databaseRequester->newQuery();
-            qUpdate.Update(CDeviceTable::getTableName()).
-                   Set(CDeviceTable::getConfigurationColumnName(), configuration.serialize()).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qUpdate.Update(dbCommon::CDeviceTable::getTableName()).
+                   Set(dbCommon::CDeviceTable::getConfigurationColumnName(), configuration.serialize()).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
 
             if (m_databaseRequester->queryStatement(qUpdate) <= 0)
                throw shared::exception::CEmptyResult("Fail to update device configuration");
@@ -259,9 +259,9 @@ namespace database
                throw shared::exception::CEmptyResult("The device does not exists");
 
             auto qUpdate = m_databaseRequester->newQuery();
-            qUpdate.Update(CDeviceTable::getTableName()).
-                   Set(CDeviceTable::getDetailsColumnName(), details.serialize()).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qUpdate.Update(dbCommon::CDeviceTable::getTableName()).
+                   Set(dbCommon::CDeviceTable::getDetailsColumnName(), details.serialize()).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
 
             if (m_databaseRequester->queryStatement(qUpdate) <= 0)
                throw shared::exception::CEmptyResult("Fail to update device details");
@@ -273,9 +273,9 @@ namespace database
                throw shared::exception::CEmptyResult("The device does not exists");
 
             auto qUpdate = m_databaseRequester->newQuery();
-            qUpdate.Update(CDeviceTable::getTableName()).
-                   Set(CDeviceTable::getModelColumnName(), model).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qUpdate.Update(dbCommon::CDeviceTable::getTableName()).
+                   Set(dbCommon::CDeviceTable::getModelColumnName(), model).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
 
             if (m_databaseRequester->queryStatement(qUpdate) <= 0)
                throw shared::exception::CEmptyResult("Fail to update device model");
@@ -287,9 +287,9 @@ namespace database
                throw shared::exception::CEmptyResult("The device does not exists");
 
             auto qUpdate = m_databaseRequester->newQuery();
-            qUpdate.Update(CDeviceTable::getTableName()).
-                   Set(CDeviceTable::getTypeColumnName(), type).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qUpdate.Update(dbCommon::CDeviceTable::getTableName()).
+                   Set(dbCommon::CDeviceTable::getTypeColumnName(), type).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
 
             if (m_databaseRequester->queryStatement(qUpdate) <= 0)
                throw shared::exception::CEmptyResult("Fail to update device type");
@@ -301,9 +301,9 @@ namespace database
                throw shared::exception::CEmptyResult("The device does not exists");
 
             auto qUpdate = m_databaseRequester->newQuery();
-            qUpdate.Update(CDeviceTable::getTableName()).
-                   Set(CDeviceTable::getBlacklistColumnName(), blacklist).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qUpdate.Update(dbCommon::CDeviceTable::getTableName()).
+                   Set(dbCommon::CDeviceTable::getBlacklistColumnName(), blacklist).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
 
             if (m_databaseRequester->queryStatement(qUpdate) <= 0)
                throw shared::exception::CEmptyResult("Fail to update device blacklist");
@@ -315,19 +315,19 @@ namespace database
             return device->Blacklist();
          }
 
-         std::vector<boost::shared_ptr<entities::CDevice>> CDevice::getDevices(bool blacklistedIncluded) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDevice::getDevices(bool blacklistedIncluded) const
          {
             auto qSelect = m_databaseRequester->newQuery();
 
             if (blacklistedIncluded)
                qSelect.Select().
-                      From(CDeviceTable::getTableName());
+                      From(dbCommon::CDeviceTable::getTableName());
             else
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
@@ -338,36 +338,36 @@ namespace database
             auto qSelect = m_databaseRequester->newQuery();
 
             if (blacklistedIncluded)
-               qSelect.Select(CDeviceTable::getNameColumnName()).
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId);
+               qSelect.Select(dbCommon::CDeviceTable::getNameColumnName()).
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId);
             else
-               qSelect.Select(CDeviceTable::getNameColumnName()).
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
-                      And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+               qSelect.Select(dbCommon::CDeviceTable::getNameColumnName()).
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
+                      And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CSingleValueAdapter<std::string> adapter;
+            dbCommon::adapters::CSingleValueAdapter<std::string> adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
 
-         std::vector<boost::shared_ptr<entities::CDevice>> CDevice::getDevices(int pluginId,
-                                                                               bool blacklistedIncluded) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDevice::getDevices(int pluginId,
+                                                                                         bool blacklistedIncluded) const
          {
             auto qSelect = m_databaseRequester->newQuery();
 
             if (blacklistedIncluded)
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId);
             else
                qSelect.Select().
-                      From(CDeviceTable::getTableName()).
-                      Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
-                      And(CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
+                      From(dbCommon::CDeviceTable::getTableName()).
+                      Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId).
+                      And(dbCommon::CDeviceTable::getBlacklistColumnName(), CQUERY_OP_EQUAL, 0);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
@@ -375,13 +375,13 @@ namespace database
          void CDevice::removeDevice(int deviceId)
          {
             auto qDelete = m_databaseRequester->newQuery();
-            qDelete.DeleteFrom(CDeviceTable::getTableName()).
-                   Where(CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qDelete.DeleteFrom(dbCommon::CDeviceTable::getTableName()).
+                   Where(dbCommon::CDeviceTable::getIdColumnName(), CQUERY_OP_EQUAL, deviceId);
             if (m_databaseRequester->queryStatement(qDelete) <= 0)
                throw shared::exception::CEmptyResult("No lines affected");
 
-            qDelete.Clear().DeleteFrom(CKeywordTable::getTableName()).
-                   Where(CKeywordTable::getDeviceIdColumnName(), CQUERY_OP_EQUAL, deviceId);
+            qDelete.Clear().DeleteFrom(dbCommon::CKeywordTable::getTableName()).
+                   Where(dbCommon::CKeywordTable::getDeviceIdColumnName(), CQUERY_OP_EQUAL, deviceId);
             m_databaseRequester->queryStatement(qDelete);
          }
 
@@ -394,9 +394,9 @@ namespace database
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CDeviceTable::getTableName()).Where(CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId);
+                   From(dbCommon::CDeviceTable::getTableName()).Where(dbCommon::CDeviceTable::getPluginIdColumnName(), CQUERY_OP_EQUAL, pluginId);
 
-            adapters::CDeviceAdapter adapter;
+            dbCommon::adapters::CDeviceAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             auto devicestoDelete = adapter.getResults();
 

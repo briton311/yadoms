@@ -5,7 +5,7 @@ namespace web
 {
    namespace ws
    {
-      CLogEventFrame::CLogEventFrame(boost::shared_ptr<const database::entities::CEventLogger> logEvent)
+      CLogEventFrame::CLogEventFrame(boost::shared_ptr<const dbCommon::entities::CEventLogger> logEvent)
          : CFrameBase(EFrameType::kLogEventNew)
       {
          m_internalContainer.set("date", logEvent->Date());

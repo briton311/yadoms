@@ -1,6 +1,6 @@
 #pragma once
 #include "FrameBase.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
 namespace web
 {
@@ -16,7 +16,7 @@ namespace web
          ///\brief Constructor
          ///\param [in]    logEvent     The log event data
          //-----------------------------
-         explicit CLogEventFrame(boost::shared_ptr<const database::entities::CEventLogger> logEvent);
+         explicit CLogEventFrame(boost::shared_ptr<const dbCommon::entities::CEventLogger> logEvent);
 
          //-----------------------------
          ///\brief Destructor

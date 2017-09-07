@@ -29,19 +29,19 @@ namespace dataAccessLayer
       // IDeviceManager Implementation
       bool deviceExists(const int deviceId) const override;
       bool deviceExists(const int pluginId, const std::string& deviceName) const override;
-      boost::shared_ptr<database::entities::CDevice> getDevice(int deviceId) const override;
-      boost::shared_ptr<database::entities::CDevice> getDeviceInPlugin(const int pluginId, const std::string& name, bool includeBlacklistDevice) const override;
-      std::vector<boost::shared_ptr<database::entities::CDevice>> getDeviceWithCapacity(const std::string& capacityName,
+      boost::shared_ptr<dbCommon::entities::CDevice> getDevice(int deviceId) const override;
+      boost::shared_ptr<dbCommon::entities::CDevice> getDeviceInPlugin(const int pluginId, const std::string& name, bool includeBlacklistDevice) const override;
+      std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> getDeviceWithCapacity(const std::string& capacityName,
                                                                                         const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const override;
-      std::vector<boost::shared_ptr<database::entities::CDevice>> getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode,
+      std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode,
                                                                                             const shared::plugin::yPluginApi::EKeywordDataType& capacityType) const override;
-      boost::shared_ptr<database::entities::CDevice> createDevice(int pluginId,
+      boost::shared_ptr<dbCommon::entities::CDevice> createDevice(int pluginId,
                                                                   const std::string& name,
                                                                   const std::string& friendlyName,
                                                                   const std::string& type,
                                                                   const std::string& model,
                                                                   const shared::CDataContainer& details) override;
-      std::vector<boost::shared_ptr<database::entities::CDevice>> getDevices() const override;
+      std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> getDevices() const override;
       std::vector<std::string> getDevicesForPluginInstance(int pluginId) const override;
       void updateDeviceFriendlyName(int deviceId, const std::string& newFriendlyName) override;
       void updateDeviceConfiguration(int deviceId, const shared::CDataContainer& configuration) override;

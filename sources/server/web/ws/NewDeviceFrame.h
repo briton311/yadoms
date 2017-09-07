@@ -1,6 +1,6 @@
 #pragma once
 #include "FrameBase.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
 namespace web
 {
@@ -16,7 +16,7 @@ namespace web
          ///\brief Constructor
          ///\param [in]    content     The acquisition to send to GUI (shared_ptr)
          //-----------------------------
-         explicit CNewDeviceFrame(boost::shared_ptr<const database::entities::CDevice> content);
+         explicit CNewDeviceFrame(boost::shared_ptr<const dbCommon::entities::CDevice> content);
 
          //-----------------------------
          ///\brief Destructor

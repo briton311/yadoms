@@ -1,5 +1,6 @@
 #pragma once
-#include "database/entities/Entities.h"
+
+#include <dbCommon/entities/Entities.h>
 
 namespace dataAccessLayer
 {
@@ -34,7 +35,7 @@ namespace dataAccessLayer
       /// \param [in]      keyword   the keyword to get
       /// \throw           shared::exception::CEmptyResult if deviceId is unknown
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<database::entities::CKeyword> getKeyword(int deviceId, const std::string& keyword) const = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CKeyword> getKeyword(int deviceId, const std::string& keyword) const = 0;
 
       //--------------------------------------------------------------
       /// \brief           Get a keyword
@@ -42,7 +43,7 @@ namespace dataAccessLayer
       /// \return          the keyword found
       /// \throw           shared::exception::CEmptyResult if keyword is unknown
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<database::entities::CKeyword> getKeyword(int keywordId) const = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CKeyword> getKeyword(int keywordId) const = 0;
 
       //--------------------------------------------------------------
       /// \brief                          Get keywords identified by a friendly name in a device
@@ -51,27 +52,27 @@ namespace dataAccessLayer
       /// \return                         The list of found keywords
       /// \throw                          shared::exception::CEmptyResult if none found
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CKeyword> > getKeywordIdFromFriendlyName(int deviceId, const std::string& friendlyName) const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> getKeywordIdFromFriendlyName(int deviceId, const std::string& friendlyName) const = 0;
 
       //--------------------------------------------------------------
       /// \brief           List all keywords 
       /// \return          List of registered keywords
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CKeyword> > getAllKeywords() const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> getAllKeywords() const = 0;
 
       //--------------------------------------------------------------
       /// \brief           List all keywords for a device
       /// \param [in]      deviceId   the device which own the keyword
       /// \return          List of registered keywords
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CKeyword> > getKeywords(int deviceId) const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> getKeywords(int deviceId) const = 0;
 
       //--------------------------------------------------------------
       /// \brief           List all keywords which match a capacity
       /// \param [in]      capacity   the capacity
       /// \return          List of registered keywords
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CKeyword> > getKeywordsMatchingCapacity(const std::string& capacity) const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> getKeywordsMatchingCapacity(const std::string& capacity) const = 0;
 
       //--------------------------------------------------------------
       /// \brief           List all keywords which match capacity for a device
@@ -80,9 +81,9 @@ namespace dataAccessLayer
       /// \param [in]      capacityAccessMode   the capacity acces mode
       /// \return          List of registered keywords
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CKeyword> > getDeviceKeywordsWithCapacity(int deviceId,
-                                                                                                          const std::string& capacityName,
-                                                                                                          const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> getDeviceKeywordsWithCapacity(int deviceId,
+                                                                                                         const std::string& capacityName,
+                                                                                                         const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const = 0;
 
       //--------------------------------------------------------------
       /// \brief                    Add new keyword
@@ -102,7 +103,7 @@ namespace dataAccessLayer
       /// \throw                    shared::exception::CEmptyResult if device is unknown
       //--------------------------------------------------------------
       virtual void addKeywords(int deviceId,
-                               const std::vector<boost::shared_ptr<const shared::plugin::yPluginApi::historization::IHistorizable> >& keywords) = 0;
+                               const std::vector<boost::shared_ptr<const shared::plugin::yPluginApi::historization::IHistorizable>>& keywords) = 0;
 
       //--------------------------------------------------------------
       /// \brief                          Update a keyword friendly name
@@ -143,9 +144,6 @@ namespace dataAccessLayer
       /// \throw           shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
       virtual void removeKeyword(int keywordId) = 0;
-
-
-
    };
 } //namespace dataAccessLayer 
 

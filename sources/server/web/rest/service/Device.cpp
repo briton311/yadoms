@@ -415,7 +415,7 @@ namespace web
                   //get device id from URL
                   auto deviceId = boost::lexical_cast<int>(parameters[1]);
 
-                  database::entities::CDevice deviceToUpdate;
+                  dbCommon::entities::CDevice deviceToUpdate;
                   deviceToUpdate.fillFromSerializedString(requestContent);
                   if (deviceToUpdate.FriendlyName.isDefined())
                   {
@@ -451,7 +451,7 @@ namespace web
                   auto deviceId = boost::lexical_cast<int>(parameters[1]);
 
                   //deserialize device from request data
-                  database::entities::CDevice deviceToUpdate;
+                  dbCommon::entities::CDevice deviceToUpdate;
                   deviceToUpdate.fillFromSerializedString(requestContent);
 
                   //update friendlyname
@@ -525,7 +525,7 @@ namespace web
                   //get keyword id from URL
                   auto keywordId = boost::lexical_cast<int>(parameters[2]);
 
-                  database::entities::CKeyword keywordToUpdate;
+                  dbCommon::entities::CKeyword keywordToUpdate;
                   keywordToUpdate.fillFromSerializedString(requestContent);
                   if (keywordToUpdate.FriendlyName.isDefined())
                   {
@@ -555,7 +555,7 @@ namespace web
                   //get keyword id from URL
                   auto keywordId = boost::lexical_cast<int>(parameters[2]);
 
-                  database::entities::CKeyword keywordToUpdate;
+                  dbCommon::entities::CKeyword keywordToUpdate;
                   keywordToUpdate.fillFromSerializedString(requestContent);
                   if (keywordToUpdate.Blacklist.isDefined())
                   {

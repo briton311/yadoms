@@ -63,7 +63,7 @@ namespace automation
       YADOMS_LOG(error) << "One or more automation rules failed to start, check automation rules page for details";
    }
 
-   bool CRuleManager::startRules(const std::vector<boost::shared_ptr<database::entities::CRule>>& rules)
+   bool CRuleManager::startRules(const std::vector<boost::shared_ptr<dbCommon::entities::CRule>>& rules)
    {
       auto allRulesStarted = true;
       for (auto rule = rules.begin();
@@ -73,7 +73,7 @@ namespace automation
          try
          {
             // Start only autoStarted rules if not in error state
-            if ((*rule)->AutoStart() && (*rule)->State() != database::entities::ERuleState::kError)
+            if ((*rule)->AutoStart() && (*rule)->State() != dbCommon::entities::ERuleState::kError)
                startRule((*rule)->Id);
          }
          catch (CRuleException&)
@@ -233,12 +233,12 @@ namespace automation
       return m_startedRules.find(ruleId) != m_startedRules.end();
    }
 
-   std::vector<boost::shared_ptr<database::entities::CRule>> CRuleManager::getRules() const
+   std::vector<boost::shared_ptr<dbCommon::entities::CRule>> CRuleManager::getRules() const
    {
       return m_ruleRequester->getRules();
    }
 
-   int CRuleManager::createRule(boost::shared_ptr<const database::entities::CRule> ruleData,
+   int CRuleManager::createRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData,
                                 const std::string& code)
    {
       // Add rule in database
@@ -257,7 +257,7 @@ namespace automation
       return ruleId;
    }
 
-   boost::shared_ptr<database::entities::CRule> CRuleManager::getRule(int id) const
+   boost::shared_ptr<dbCommon::entities::CRule> CRuleManager::getRule(int id) const
    {
       return m_ruleRequester->getRule(id);
    }
@@ -309,7 +309,7 @@ namespace automation
       }
    }
 
-   void CRuleManager::updateRule(boost::shared_ptr<const database::entities::CRule> ruleData)
+   void CRuleManager::updateRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData)
    {
       // Check for supported modifications
       if (!ruleData->Id.isDefined())
@@ -400,9 +400,9 @@ namespace automation
 
    void CRuleManager::recordRuleStarted(int ruleId) const
    {
-      auto ruleData(boost::make_shared<database::entities::CRule>());
+      auto ruleData(boost::make_shared<dbCommon::entities::CRule>());
       ruleData->Id = ruleId;
-      ruleData->State = database::entities::ERuleState::kRunning;
+      ruleData->State = dbCommon::entities::ERuleState::kRunning;
       ruleData->StartDate = shared::currentTime::Provider().now();
       ruleData->ErrorMessage = std::string();
       m_ruleRequester->updateRule(ruleData);
@@ -414,16 +414,16 @@ namespace automation
       if (!error.empty())
          YADOMS_LOG(error) << error;
 
-      auto ruleData(boost::make_shared<database::entities::CRule>());
+      auto ruleData(boost::make_shared<dbCommon::entities::CRule>());
       ruleData->Id = ruleId;
-      ruleData->State = error.empty() ? database::entities::ERuleState::kStopped : database::entities::ERuleState::kError;
+      ruleData->State = error.empty() ? dbCommon::entities::ERuleState::kStopped : dbCommon::entities::ERuleState::kError;
       ruleData->StopDate = shared::currentTime::Provider().now();
       if (!error.empty())
          ruleData->ErrorMessage = error;
       m_ruleRequester->updateRule(ruleData);
 
       if (!error.empty())
-         m_eventLogger->addEvent(database::entities::ESystemEventCode::kRuleFailed,
+         m_eventLogger->addEvent(dbCommon::entities::ESystemEventCode::kRuleFailed,
                                  m_ruleRequester->getRule(ruleId)->Name(),
                                  error);
    }

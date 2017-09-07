@@ -60,7 +60,7 @@ namespace location
 
    void CLocation::updateLocation(const shared::CDataContainer& location) const
    {
-      database::entities::CConfiguration locationConfiguration;
+      dbCommon::entities::CConfiguration locationConfiguration;
       locationConfiguration.Section = "system";
       locationConfiguration.Name = "location";
       locationConfiguration.Value = location.serialize();

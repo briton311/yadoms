@@ -19,22 +19,24 @@ namespace pluginSystem
    void CBasicQualifier::signalLoad(const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation)
    {
       // Insert event in database
-      AddEventToDatabase(pluginInformation, database::entities::EEventType::kLoad);
+      AddEventToDatabase(pluginInformation, dbCommon::entities::EEventType::kLoad);
    }
 
    void CBasicQualifier::signalUnload(const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation)
    {
       // Insert event in database
-      AddEventToDatabase(pluginInformation, database::entities::EEventType::kUnload);
+      AddEventToDatabase(pluginInformation, dbCommon::entities::EEventType::kUnload);
    }
 
    void CBasicQualifier::signalCrash(const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation, const std::string& reason)
    {
       // Insert event in database
-      AddEventToDatabase(pluginInformation, database::entities::EEventType::kCrash, reason);
+      AddEventToDatabase(pluginInformation, dbCommon::entities::EEventType::kCrash, reason);
    }
 
-   void CBasicQualifier::AddEventToDatabase(const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation, database::entities::EEventType eventType, const std::string& reason) const
+   void CBasicQualifier::AddEventToDatabase(const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
+                                            dbCommon::entities::EEventType eventType,
+                                            const std::string& reason) const
    {
       try
       {
@@ -46,8 +48,8 @@ namespace pluginSystem
             reason);
 
          // Only crashes have to be logged in the main event logger table
-         if (eventType == database::entities::EEventType::kCrash)
-            m_mainLogger->addEvent(database::entities::ESystemEventCode::kPluginCrash, "plugin " + pluginInformation->getIdentity(), reason);
+         if (eventType == dbCommon::entities::EEventType::kCrash)
+            m_mainLogger->addEvent(dbCommon::entities::ESystemEventCode::kPluginCrash, "plugin " + pluginInformation->getIdentity(), reason);
       }
       catch (shared::exception::CEmptyResult& e)
       {

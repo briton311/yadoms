@@ -61,19 +61,5 @@ public:
    /// \return  	                     the logs of script interpreters path, ususally {yadoms_binary_path}/logs/scriptInterpreters
    //-----------------------------------------------------------------------------
    virtual const boost::filesystem::path& scriptInterpretersLogPath() const = 0;
-
-   //--------------------------------------------------------------
-   /// \brief	    Get the path of the SQLite database file
-   /// \return     Database file path
-   /// \note       If not exist, Yadoms will create the file
-   //--------------------------------------------------------------
-   virtual const boost::filesystem::path& databaseSqliteFile() const = 0;
-
-   //--------------------------------------------------------------
-   /// \brief	    Get the path of the SQLite database backup file
-   /// \return     Database file path
-   /// \note       If not exist, Yadoms will create the backup file of overwrite it
-   //--------------------------------------------------------------
-   virtual const boost::filesystem::path& databaseSqliteBackupFile() const = 0;
 };
 

@@ -35,13 +35,13 @@ namespace automation
       void start() override;
       void stop() override;
       std::vector<std::string> getAvailableInterpreters() override;
-      std::vector<boost::shared_ptr<database::entities::CRule>> getRules() const override;
-      int createRule(boost::shared_ptr<const database::entities::CRule> ruleData, const std::string& code) override;
-      boost::shared_ptr<database::entities::CRule> getRule(int id) const override;
+      std::vector<boost::shared_ptr<dbCommon::entities::CRule>> getRules() const override;
+      int createRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData, const std::string& code) override;
+      boost::shared_ptr<dbCommon::entities::CRule> getRule(int id) const override;
       std::string getRuleCode(int id) const override;
       std::string getRuleLog(int id) const override;
       std::string getRuleTemplateCode(const std::string& interpreterName) const override;
-      void updateRule(boost::shared_ptr<const database::entities::CRule> ruleData) override;
+      void updateRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData) override;
       void updateRuleCode(int id, const std::string& code) override;
       void deleteRule(int id) override;
       void startAllRulesMatchingInterpreter(const std::string& interpreterName) override;
@@ -65,7 +65,7 @@ namespace automation
       ///\param[in] rules     Rules to start
       ///\return              true if all rules were successfully started
       //-----------------------------------------------------
-      bool startRules(const std::vector<boost::shared_ptr<database::entities::CRule>>& rules);
+      bool startRules(const std::vector<boost::shared_ptr<dbCommon::entities::CRule>>& rules);
 
       //-----------------------------------------------------
       ///\brief               Check if a rule is started

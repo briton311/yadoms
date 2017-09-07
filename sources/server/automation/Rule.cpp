@@ -6,7 +6,7 @@
 
 namespace automation
 {
-   CRule::CRule(boost::shared_ptr<const database::entities::CRule> ruleData,
+   CRule::CRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData,
                 const IPathProvider& pathProvider,
                 boost::shared_ptr<interpreter::IManager> interpreterManager,
                 boost::shared_ptr<communication::ISendMessageAsync> pluginGateway,

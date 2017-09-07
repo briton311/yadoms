@@ -1,16 +1,15 @@
 #include "stdafx.h"
 
 #include "SQLiteRequester.h"
-#include "database/common/adapters/GenericAdapter.h"
-#include "database/common/adapters/SingleValueAdapter.hpp"
 #include "SQLiteSystemTables.h"
-#include "database/DatabaseException.hpp"
 #include "SQLiteResultHandler.h"
 #include "SQLiteTableCreationScriptProvider.h"
 #include "SQLiteQuery.h"
 #include <shared/Log.h>
 #include <shared/exception/NullReference.hpp>
 #include "i18n/ClientStrings.h"
+#include <dbCommon/adapters/SingleValueAdapter.hpp>
+#include <dbCommon/adapters/GenericAdapter.h>
 
 namespace database
 {
@@ -22,10 +21,8 @@ namespace database
       int CSQLiteRequester::m_maxTries = 3;
 
 
-      CSQLiteRequester::CSQLiteRequester(const std::string& dbFile, const std::string& dbBackupFile)
+      CSQLiteRequester::CSQLiteRequester()
          : m_pDatabaseHandler(nullptr),
-           m_dbFile(dbFile),
-           m_dbBackupFile(dbBackupFile),
            m_bOneTransactionActive(false)
       {
       }
@@ -34,23 +31,28 @@ namespace database
       {
       }
 
+      void CSQLiteRequester::setOptions(boost::shared_ptr<const shared::CDataContainer> options)
+      {
+         m_options = boost::make_shared<CSQLiteOptions>(options);
+      }
+
       // IDatabaseEngine implementation
       void CSQLiteRequester::initialize()
       {
          YADOMS_LOG(information) << "Initialize SQLite database";
          try
          {
-            if (!boost::filesystem::exists(m_dbFile.c_str()))
+            if (!boost::filesystem::exists(m_options->getDatabaseFile().c_str()))
             {
-               YADOMS_LOG(information) << "Database file is not found : " << m_dbFile;
+               YADOMS_LOG(information) << "Database file is not found : " << m_options->getDatabaseFile();
                YADOMS_LOG(information) << "Yadoms will create a blank one";
             }
 
-            auto rc = sqlite3_open(m_dbFile.c_str(), &m_pDatabaseHandler);
+            auto rc = sqlite3_open(m_options->getDatabaseFile().c_str(), &m_pDatabaseHandler);
             if (rc)
             {
                std::string error = sqlite3_errmsg(m_pDatabaseHandler);
-               throw CDatabaseException(error);
+               throw dbCommon::CDatabaseException(error);
             }
 
             //extended sql engine
@@ -84,7 +86,7 @@ namespace database
          shared::CDataContainer results;
          results.set("type", "SQLite");
          results.set("version", sqlite3_libversion());
-         results.set("size", boost::filesystem::file_size(boost::filesystem::path(m_dbFile)));
+         results.set("size", boost::filesystem::file_size(boost::filesystem::path(m_options->getDatabaseFile())));
          return results;
       }
 
@@ -130,7 +132,7 @@ namespace database
 
 
       // IDatabaseProvider implementation
-      common::CQuery CSQLiteRequester::newQuery()
+      dbCommon::CQuery CSQLiteRequester::newQuery()
       {
          return CSQLiteQuery();
       }
@@ -141,8 +143,8 @@ namespace database
       /// \param [in]	 adapter:  pointer to the adapter to use to map raw values to a new entity
       /// \param [in]	 querytoExecute: the sql query
       //--------------------------------------------------------------
-      void CSQLiteRequester::queryEntities(common::adapters::IResultAdapter* pAdapter,
-                                           const common::CQuery& querytoExecute)
+      void CSQLiteRequester::queryEntities(dbCommon::adapters::IResultAdapter* pAdapter,
+                                           const dbCommon::CQuery& querytoExecute)
       {
          BOOST_ASSERT(pAdapter != NULL);
 
@@ -162,7 +164,7 @@ namespace database
                   auto rc = sqlite3_prepare_v2(m_pDatabaseHandler, querytoExecute.c_str(), -1, &stmt, nullptr);
                   if (rc == SQLITE_OK)
                   {
-                     boost::shared_ptr<CSQLiteResultHandler> handler(new CSQLiteResultHandler(stmt));
+                     auto handler(boost::make_shared<CSQLiteResultHandler>(stmt));
                      if (!pAdapter->adapt(handler))
                      {
                         YADOMS_LOG(error) << "Fail to adapt values";
@@ -205,11 +207,11 @@ namespace database
       }
 
 
-      int CSQLiteRequester::queryStatement(const common::CQuery& querytoExecute,
+      int CSQLiteRequester::queryStatement(const dbCommon::CQuery& querytoExecute,
                                            bool throwIfFails)
       {
-         BOOST_ASSERT(querytoExecute.GetQueryType() != common::CQuery::kNotYetDefined);
-         BOOST_ASSERT(querytoExecute.GetQueryType() != common::CQuery::kSelect);
+         BOOST_ASSERT(querytoExecute.GetQueryType() != dbCommon::CQuery::kNotYetDefined);
+         BOOST_ASSERT(querytoExecute.GetQueryType() != dbCommon::CQuery::kSelect);
 
          //execute the query
          char* zErrMsg = nullptr;
@@ -254,7 +256,7 @@ namespace database
                else
                {
                   if (throwIfFails)
-                     throw CDatabaseException(errMessage, fromSQLiteReturnCode(rc));
+                     throw dbCommon::CDatabaseException(errMessage, fromSQLiteReturnCode(rc));
                   return -1;
                }
             }
@@ -270,12 +272,12 @@ namespace database
       }
 
 
-      int CSQLiteRequester::queryCount(const common::CQuery& querytoExecute)
+      int CSQLiteRequester::queryCount(const dbCommon::CQuery& querytoExecute)
       {
-         BOOST_ASSERT(querytoExecute.GetQueryType() != common::CQuery::kNotYetDefined);
-         BOOST_ASSERT(querytoExecute.GetQueryType() == common::CQuery::kSelect);
+         BOOST_ASSERT(querytoExecute.GetQueryType() != dbCommon::CQuery::kNotYetDefined);
+         BOOST_ASSERT(querytoExecute.GetQueryType() == dbCommon::CQuery::kSelect);
 
-         common::adapters::CSingleValueAdapter<int> countAdapter;
+         dbCommon::adapters::CSingleValueAdapter<int> countAdapter;
          queryEntities(&countAdapter, querytoExecute);
 
          if (countAdapter.getResults().size() >= 1)
@@ -283,10 +285,10 @@ namespace database
          return -1;
       }
 
-      CSQLiteRequester::QueryRow CSQLiteRequester::querySingleLine(const common::CQuery& querytoExecute)
+      CSQLiteRequester::QueryRow CSQLiteRequester::querySingleLine(const dbCommon::CQuery& querytoExecute)
       {
-         BOOST_ASSERT(querytoExecute.GetQueryType() != common::CQuery::kNotYetDefined);
-         BOOST_ASSERT(querytoExecute.GetQueryType() == common::CQuery::kSelect);
+         BOOST_ASSERT(querytoExecute.GetQueryType() != dbCommon::CQuery::kNotYetDefined);
+         BOOST_ASSERT(querytoExecute.GetQueryType() == dbCommon::CQuery::kSelect);
 
          QueryResults results = query(querytoExecute);
          if (results.size() >= 1)
@@ -296,12 +298,12 @@ namespace database
       }
 
 
-      CSQLiteRequester::QueryResults CSQLiteRequester::query(const common::CQuery& querytoExecute)
+      CSQLiteRequester::QueryResults CSQLiteRequester::query(const dbCommon::CQuery& querytoExecute)
       {
-         BOOST_ASSERT(querytoExecute.GetQueryType() != common::CQuery::kNotYetDefined);
-         BOOST_ASSERT(querytoExecute.GetQueryType() == common::CQuery::kSelect);
+         BOOST_ASSERT(querytoExecute.GetQueryType() != dbCommon::CQuery::kNotYetDefined);
+         BOOST_ASSERT(querytoExecute.GetQueryType() == dbCommon::CQuery::kSelect);
 
-         common::adapters::CGenericAdapter genericAdapter;
+         dbCommon::adapters::CGenericAdapter genericAdapter;
          queryEntities(&genericAdapter, querytoExecute);
          return genericAdapter.getResults();
       }
@@ -343,7 +345,7 @@ namespace database
          return m_bOneTransactionActive;
       }
 
-      bool CSQLiteRequester::checkTableExists(const common::CDatabaseTable& tableName)
+      bool CSQLiteRequester::checkTableExists(const dbCommon::CDatabaseTable& tableName)
       {
          //check that table Configuration exists
          CSQLiteQuery sCheckForTableExists;
@@ -351,12 +353,12 @@ namespace database
                              From(CSqliteMasterTable::getTableName()).
                              Where(CSqliteMasterTable::getTypeColumnName(), CQUERY_OP_EQUAL, SQLITEMASTER_TABLE).
                              And(CSqliteMasterTable::getNameColumnName(), CQUERY_OP_EQUAL, tableName.GetName());
-         int count = queryCount(sCheckForTableExists);
+         auto count = queryCount(sCheckForTableExists);
          return (count == 1);
       }
 
 
-      bool CSQLiteRequester::dropTableIfExists(const common::CDatabaseTable& tableName)
+      bool CSQLiteRequester::dropTableIfExists(const dbCommon::CDatabaseTable& tableName)
       {
          if (checkTableExists(tableName))
          {
@@ -368,18 +370,18 @@ namespace database
       }
 
 
-      bool CSQLiteRequester::createTableIfNotExists(const common::CDatabaseTable& tableName,
+      bool CSQLiteRequester::createTableIfNotExists(const dbCommon::CDatabaseTable& tableName,
                                                     const std::string& tableScript)
       {
          if (!checkTableExists(tableName))
          {
-            queryStatement(common::CQuery::CustomQuery(tableScript, common::CQuery::kCreate));
+            queryStatement(dbCommon::CQuery::CustomQuery(tableScript, dbCommon::CQuery::kCreate));
             return checkTableExists(tableName);
          }
          return true;
       }
 
-      bool CSQLiteRequester::addTableColumn(const common::CDatabaseTable& tableName, const std::string& columnDef)
+      bool CSQLiteRequester::addTableColumn(const dbCommon::CDatabaseTable& tableName, const std::string& columnDef)
       {
          if (checkTableExists(tableName))
          {
@@ -390,10 +392,10 @@ namespace database
          return false;
       }
 
-      void CSQLiteRequester::createIndex(const common::CDatabaseTable& tableName,
+      void CSQLiteRequester::createIndex(const dbCommon::CDatabaseTable& tableName,
                                          const std::string& indexScript)
       {
-         queryStatement(common::CQuery::CustomQuery(indexScript, common::CQuery::kCreate));
+         queryStatement(dbCommon::CQuery::CustomQuery(indexScript, dbCommon::CQuery::kCreate));
       }
 
 
@@ -407,11 +409,11 @@ namespace database
          sqlite3* pFile; /* Database connection opened on zFilename */
 
          /* Open the database file identified by zFilename. */
-         int rc = sqlite3_open(m_dbBackupFile.c_str(), &pFile);
+         auto rc = sqlite3_open(m_options->getDatabaseBackupFile().c_str(), &pFile);
          if (rc == SQLITE_OK)
          {
             /* Open the sqlite3_backup object used to accomplish the transfer */
-            sqlite3_backup* pBackup = sqlite3_backup_init(pFile, "main", m_pDatabaseHandler, "main");
+            auto pBackup = sqlite3_backup_init(pFile, "main", m_pDatabaseHandler, "main");
             if (pBackup)
             {
                /* Each iteration of this loop copies 20 database pages from database
@@ -448,8 +450,6 @@ namespace database
 
                /* Release resources allocated by backup_init(). */
                (void)sqlite3_backup_finish(pBackup);
-
-
             }
             rc = sqlite3_errcode(pFile);
          }
@@ -469,19 +469,19 @@ namespace database
 
       boost::filesystem::path CSQLiteRequester::lastBackupData()
       {
-         return boost::filesystem::path(m_dbBackupFile);
+         return boost::filesystem::path(m_options->getDatabaseBackupFile());
       }
 
-      CDatabaseException::EDatabaseReturnCodes CSQLiteRequester::fromSQLiteReturnCode(int rc)
+      dbCommon::CDatabaseException::EDatabaseReturnCodes CSQLiteRequester::fromSQLiteReturnCode(int rc)
       {
-         switch(rc)
+         switch (rc)
          {
          case SQLITE_OK:
-            return CDatabaseException::kOk;
+            return dbCommon::CDatabaseException::kOk;
          case SQLITE_CONSTRAINT:
-            return CDatabaseException::kConstraintViolation;
+            return dbCommon::CDatabaseException::kConstraintViolation;
          default:
-            return CDatabaseException::kError;
+            return dbCommon::CDatabaseException::kError;
          }
       }
 
@@ -489,8 +489,8 @@ namespace database
       {
          //we ensure that no transaction is active
          //is a transaction is active, hust wait for the transaction to end (timetout 20sec)
-         int waitLoopCount = 0;
-         int maxLoopWait = 600; //2 min
+         auto waitLoopCount = 0;
+         auto maxLoopWait = 600; //2 min
 
          while (m_bOneTransactionActive && waitLoopCount < maxLoopWait)
          {
@@ -505,7 +505,7 @@ namespace database
             queryStatement(CSQLiteQuery().Vacuum());
       }
 
-      boost::shared_ptr<ITableCreationScriptProvider> CSQLiteRequester::getTableCreationScriptProvider()
+      boost::shared_ptr<dbCommon::ITableCreationScriptProvider> CSQLiteRequester::getTableCreationScriptProvider()
       {
          return boost::make_shared<CSQLiteTableCreationScriptProvider>();
       }

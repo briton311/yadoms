@@ -58,7 +58,7 @@ void CSupervisor::run()
       auto startupOptions = shared::CServiceLocator::instance().get<startupOptions::IStartupOptions>();
 
       //start database system
-      auto pDataProvider = database::CFactory::create(m_pathProvider);
+      auto pDataProvider = database::CFactory::create(startupOptions);
       if (!pDataProvider->load())
          throw shared::exception::CException("Fail to load database");
 
@@ -111,8 +111,9 @@ void CSupervisor::run()
 
       if (pDataProvider->getDatabaseRequester()->backupSupported())
       {
-         auto filename = m_pathProvider.databaseSqliteBackupFile().filename().string();
-         webServer->getConfigurator()->websiteHandlerAddAlias(filename, m_pathProvider.databaseSqliteBackupFile().string());
+         //TODO code specific to SQLite... Need to be fixed
+         auto filename = boost::filesystem::path(startupOptions->getDatabaseSqliteBackupFile()).filename().string();
+         webServer->getConfigurator()->websiteHandlerAddAlias(filename, boost::filesystem::path(startupOptions->getDatabaseSqliteBackupFile()).string());
       }
 
       webServer->getConfigurator()->configureAuthentication(boost::make_shared<authentication::CBasicAuthentication>(dal->getConfigurationManager(), startupOptions->getNoPasswordFlag()));
@@ -144,7 +145,7 @@ void CSupervisor::run()
       dateTimeNotificationService.start();
 
       // Register to event logger started event
-      dal->getEventLogger()->addEvent(database::entities::ESystemEventCode::kStarted, "yadoms", std::string());
+      dal->getEventLogger()->addEvent(dbCommon::entities::ESystemEventCode::kStarted, "yadoms", std::string());
 
       //update the server state
       shared::CServiceLocator::instance().get<IRunningInformation>()->setServerFullyLoaded();
@@ -181,31 +182,31 @@ void CSupervisor::run()
       //stop database tasks
       pDataProvider->stopMaintenanceTasks();
 
-      dal->getEventLogger()->addEvent(database::entities::ESystemEventCode::kStopped, "yadoms", std::string());
+      dal->getEventLogger()->addEvent(dbCommon::entities::ESystemEventCode::kStopped, "yadoms", std::string());
    }
    catch (Poco::Net::NetException& pe)
    {
       YADOMS_LOG(error) << "Supervisor : net exception " << pe.displayText();
       if (dal && dal->getEventLogger())
-         dal->getEventLogger()->addEvent(database::entities::ESystemEventCode::kYadomsCrash, "yadoms", pe.displayText());
+         dal->getEventLogger()->addEvent(dbCommon::entities::ESystemEventCode::kYadomsCrash, "yadoms", pe.displayText());
    }
    catch (Poco::Exception& e)
    {
       YADOMS_LOG(error) << "Supervisor : unhandled exception " << e.displayText();
       if (dal && dal->getEventLogger())
-         dal->getEventLogger()->addEvent(database::entities::ESystemEventCode::kYadomsCrash, "yadoms", e.displayText());
+         dal->getEventLogger()->addEvent(dbCommon::entities::ESystemEventCode::kYadomsCrash, "yadoms", e.displayText());
    }
    catch (std::exception& e)
    {
       YADOMS_LOG(error) << "Supervisor : unhandled exception " << e.what();
       if (dal && dal->getEventLogger())
-         dal->getEventLogger()->addEvent(database::entities::ESystemEventCode::kYadomsCrash, "yadoms", e.what());
+         dal->getEventLogger()->addEvent(dbCommon::entities::ESystemEventCode::kYadomsCrash, "yadoms", e.what());
    }
    catch (...)
    {
       YADOMS_LOG(error) << "Supervisor : unhandled exception.";
       if (dal && dal->getEventLogger())
-         dal->getEventLogger()->addEvent(database::entities::ESystemEventCode::kYadomsCrash, "yadoms", "unknwon error");
+         dal->getEventLogger()->addEvent(dbCommon::entities::ESystemEventCode::kYadomsCrash, "yadoms", "unknwon error");
    }
 
    //notify application that supervisor ends

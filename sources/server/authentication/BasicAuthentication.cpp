@@ -6,8 +6,8 @@
 
 #include "notification/Helpers.hpp"
 
-namespace authentication {
-
+namespace authentication
+{
    const std::string CBasicAuthentication::m_configurationSection("system");
    const std::string CBasicAuthentication::m_configurationName("basicAuthentication");
    const std::string CBasicAuthentication::m_configurationActive("active");
@@ -15,14 +15,14 @@ namespace authentication {
    const std::string CBasicAuthentication::m_configurationPassword("password");
 
    CBasicAuthentication::CBasicAuthentication(boost::shared_ptr<dataAccessLayer::IConfigurationManager> configurationManager, bool skipPasswordCheck)
-      :m_configurationManager(configurationManager), m_skipPasswordCheck(skipPasswordCheck)
+      : m_configurationManager(configurationManager), m_skipPasswordCheck(skipPasswordCheck)
    {
       if (!m_skipPasswordCheck)
       {
          //read configuration from database
          updateConfiguration();
 
-         m_observer = notification::CHelpers::subscribeBasicObserver<database::entities::CConfiguration>(boost::bind(&CBasicAuthentication::onConfigurationUpdated, this, _1));
+         m_observer = notification::CHelpers::subscribeBasicObserver<dbCommon::entities::CConfiguration>(boost::bind(&CBasicAuthentication::onConfigurationUpdated, this, _1));
       }
    }
 
@@ -39,7 +39,7 @@ namespace authentication {
       return (!m_skipPasswordCheck && m_isAuthenticationActive);
    }
 
-   bool CBasicAuthentication::authenticate(const std::string & username, const std::string & password) const
+   bool CBasicAuthentication::authenticate(const std::string& username, const std::string& password) const
    {
       if (isAuthenticationActive())
       {
@@ -53,7 +53,7 @@ namespace authentication {
 
             return boost::iequals(username, m_currentAuthenticationUsername) && boost::equals(cypherPassword, m_currentAuthenticationPassword);
          }
-         catch (std::exception & ex)
+         catch (std::exception& ex)
          {
             YADOMS_LOG(error) << "Fail to read configuration value :" << ex.what();
          }
@@ -61,7 +61,7 @@ namespace authentication {
       return true;
    }
 
-   void CBasicAuthentication::onConfigurationUpdated(boost::shared_ptr<database::entities::CConfiguration> newConfiguration)
+   void CBasicAuthentication::onConfigurationUpdated(boost::shared_ptr<dbCommon::entities::CConfiguration> newConfiguration)
    {
       if (newConfiguration && boost::iequals(newConfiguration->Section(), m_configurationSection) && boost::iequals(newConfiguration->Name(), m_configurationName))
       {
@@ -69,14 +69,14 @@ namespace authentication {
          updateConfiguration();
       }
    }
-   
+
    void CBasicAuthentication::updateConfiguration()
    {
       boost::lock_guard<boost::mutex> lock(m_configurationMutex);
       try
       {
-         boost::shared_ptr<database::entities::CConfiguration> currentConfig = m_configurationManager->getConfiguration(m_configurationSection, m_configurationName);
-         
+         boost::shared_ptr<dbCommon::entities::CConfiguration> currentConfig = m_configurationManager->getConfiguration(m_configurationSection, m_configurationName);
+
          m_isAuthenticationActive = false;
          m_currentAuthenticationUsername = std::string();
          m_currentAuthenticationPassword = std::string();
@@ -102,7 +102,7 @@ namespace authentication {
                         YADOMS_LOG(warning) << "The configuration system.basicAuthentication do not contain 'user' and 'password' settings";
                      }
                   }
-                  catch (std::exception & ex)
+                  catch (std::exception& ex)
                   {
                      YADOMS_LOG(error) << "Fail to extract configuration data :" << ex.what();
                   }
@@ -110,7 +110,7 @@ namespace authentication {
             }
          }
       }
-      catch (std::exception &)
+      catch (std::exception&)
       {
          YADOMS_LOG(warning) << "Can not find configuration item : system.basicAuthentication, disable authentication";
          m_isAuthenticationActive = false;
@@ -118,7 +118,6 @@ namespace authentication {
          m_currentAuthenticationPassword = std::string();
       }
    }
-
-
-
 } //namespace authentication
+
+

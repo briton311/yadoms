@@ -1,7 +1,7 @@
 #pragma once
 #include <shared/plugin/information/IInformation.h>
 #include "IInstance.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 #include "database/IDataProvider.h"
 #include "dataAccessLayer/IDataAccessLayer.h"
 #include "IQualifier.h"
@@ -42,7 +42,7 @@ namespace pluginSystem
       /// \param [in]   onPluginsStoppedFct        Function called when plugin is stopped
       /// \return                      The plugin instance
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<IInstance> createInstance(boost::shared_ptr<const database::entities::CPlugin> instanceData,
+      virtual boost::shared_ptr<IInstance> createInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                           boost::shared_ptr<database::IDataProvider> dataProvider,
                                                           boost::shared_ptr<dataAccessLayer::IDataAccessLayer> dataAccessLayer,
                                                           boost::shared_ptr<IQualifier> qualifier,

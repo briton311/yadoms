@@ -5,7 +5,7 @@ namespace web
 {
    namespace ws
    {
-      CAcquisitionUpdateFrame::CAcquisitionUpdateFrame(boost::shared_ptr<const database::entities::CAcquisition> acquisition)
+      CAcquisitionUpdateFrame::CAcquisitionUpdateFrame(boost::shared_ptr<const dbCommon::entities::CAcquisition> acquisition)
          : CFrameBase(EFrameType::kAcquisitionUpdate)
       {
          m_internalContainer.set(m_dataFieldName, acquisition);

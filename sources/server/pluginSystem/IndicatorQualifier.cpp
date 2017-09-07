@@ -45,7 +45,7 @@ namespace pluginSystem
 
    bool CIndicatorQualifier::isSafe(const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation)
    {
-      int quality = getQualityLevel(pluginInformation);
+      auto quality = getQualityLevel(pluginInformation);
       return quality == kNoEnoughData || quality >= m_SafetyThreshold;
    }
 
@@ -61,7 +61,7 @@ namespace pluginSystem
          return cacheIterator->second;
 
       // If not found in cache, compute it
-      int qualityLevel = computeQuality(identity);
+      auto qualityLevel = computeQuality(identity);
       // And store it in cache
       m_qualityIndicatorsCache[identity] = qualityLevel;
 
@@ -72,7 +72,7 @@ namespace pluginSystem
    {
       boost::lock_guard<boost::mutex> lock(m_qualityIndicatorsCacheMutex);
 
-      QualityIndicatorsCache::iterator cacheIterator = m_qualityIndicatorsCache.find(identity);
+      auto cacheIterator = m_qualityIndicatorsCache.find(identity);
       if (cacheIterator == m_qualityIndicatorsCache.end())
          return; // Not found in cache, nothing to do
 
@@ -92,12 +92,12 @@ namespace pluginSystem
       {
          switch ((*it)->EventType())
          {
-         case database::entities::EEventType::kLoadValue:
+         case dbCommon::entities::EEventType::kLoadValue:
             {
                lastLoadTime = (*it)->EventDate();
                break;
             }
-         case database::entities::EEventType::kUnloadValue:
+         case dbCommon::entities::EEventType::kUnloadValue:
             {
                if (lastLoadTime != boost::posix_time::not_a_date_time)
                   runningDuration += (*it)->EventDate() - lastLoadTime;
@@ -105,7 +105,7 @@ namespace pluginSystem
                lastLoadTime = boost::posix_time::not_a_date_time;
                break;
             }
-         case database::entities::EEventType::kCrashValue:
+         case dbCommon::entities::EEventType::kCrashValue:
             {
                crashsNb++;
                break;

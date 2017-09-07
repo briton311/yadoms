@@ -370,15 +370,11 @@ set(YADOMS_SRC
    server/dataAccessLayer/IEventLogger.h
    server/dataAccessLayer/IKeywordManager.h
 	
-   server/database/DatabaseException.hpp
    server/database/IConfigurationRequester.h
    server/database/IAcquisitionRequester.h
    server/database/IDataProvider.h
    server/database/Factory.h
    server/database/Factory.cpp
-   server/database/IDatabaseEngine.h
-   server/database/IDatabaseRequester.h
-   server/database/IDataBackup.h
    server/database/IDeviceRequester.h
    server/database/IEventLoggerRequester.h
    server/database/IRuleRequester.h
@@ -387,13 +383,7 @@ set(YADOMS_SRC
    server/database/IPluginEventLoggerRequester.h
    server/database/IPluginRequester.h
    server/database/IRecipientRequester.h
-   server/database/ITableCreationScriptProvider.h
-   server/database/ITransactionalProvider.h
    server/database/IWidgetRequester.h
-
-   server/database/entities/Entities.h
-   server/database/entities/Entities.cpp
-   server/database/entities/EntityHelpers.hpp
   
    server/i18n/ClientStrings.h
    server/i18n/ClientStrings.cpp
@@ -705,30 +695,12 @@ source_group(server\\tools\\platformSpecific\\mac server/tools/mac/tools/*.*)
 #### Database (common)
 ################################################
 set(YADOMS_SRC ${YADOMS_SRC}
-	server/database/common/Query.h
-	server/database/common/Query.cpp
-	server/database/common/QuerySpecializations.h
 	server/database/common/DataProvider.h
 	server/database/common/DataProvider.cpp
-	server/database/common/DatabaseColumn.h
-	server/database/common/DatabaseColumn.cpp
-	server/database/common/DatabaseTables.h
-	server/database/common/DatabaseTables.cpp
-	server/database/common/DatabaseTablesHelpers.hpp
 	server/database/common/SummaryDataTask.h
 	server/database/common/SummaryDataTask.cpp      
 	server/database/common/PurgeTask.h
-	server/database/common/PurgeTask.cpp      
-	server/database/common/adapters/AdapterHelpers.hpp
-	server/database/common/adapters/DatabaseAdapters.h
-	server/database/common/adapters/DatabaseAdapters.cpp
-	server/database/common/adapters/GenericAdapter.h
-	server/database/common/adapters/GenericAdapter.cpp
-	server/database/common/adapters/HighchartValueAdapter.hpp
-	server/database/common/adapters/IResultAdapter.h
-	server/database/common/adapters/MultipleValueAdapter.hpp
-	server/database/common/adapters/SingleValueAdapter.hpp
-	server/database/common/adapters/SqlExtension.hpp
+	server/database/common/PurgeTask.cpp
 	server/database/common/requesters/Plugin.h
 	server/database/common/requesters/Plugin.cpp
 	server/database/common/requesters/Configuration.h
@@ -767,12 +739,9 @@ set(YADOMS_SRC ${YADOMS_SRC}
 	server/database/common/versioning/VersionUpgraderFactory.h
 	server/database/common/versioning/VersionUpgraderFactory.cpp
 	server/database/common/versioning/VersionException.h
-                   
-	server/database/common/IResultHandler.h
 )
 
 source_group(server\\database\\common  server/database/common/*.*)
-source_group(server\\database\\common\\adapters  server/database/common/adapters/*.*)
 source_group(server\\database\\common\\requesters  server/database/common/requesters/*.*)
 source_group(server\\database\\common\\versioning  server/database/common/versioning/*.*)
 
@@ -784,6 +753,8 @@ IF(USE_SQLITE_DATABASE)
 	set(YADOMS_SRC ${YADOMS_SRC}
 		server/database/sqlite/SQLiteQuery.h
 		server/database/sqlite/SQLiteQuery.cpp
+		server/database/sqlite/SQLiteOptions.h
+		server/database/sqlite/SQLiteOptions.cpp
 		server/database/sqlite/SQLiteRequester.h
 		server/database/sqlite/SQLiteRequester.cpp
 		server/database/sqlite/SQLiteResultHandler.h
@@ -887,9 +858,16 @@ ENDIF()
 
 
 ################################################
+## Common Database (dbCommon)
+################################################
+add_subdirectory(dbCommon)
+
+
+
+################################################
 ## Database (PostgreSQL)
 ################################################
-add_subdirectory(server/database/pgsql/pgsql-adapter)
+add_subdirectory(pgsql-adapter)
 
 
 ##################################################################################################
@@ -931,6 +909,7 @@ add_subdirectory(scriptInterpreters)
 set(YADOMS_INCL_DIR
 	${YADOMS_INCL_DIR}
 	${SHARED_INCL_DIR}
+   ${DBCOMMON_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/server
 	${plugin_IPC_INCLUDE_DIRS}
 	${interpreter_IPC_INCLUDE_DIRS}
@@ -951,7 +930,16 @@ set_property(TARGET yadoms PROPERTY INCLUDE_DIRECTORIES ${YADOMS_ALL_INCL_DIR})
 ##################################################################################################
 ## Link
 ##################################################################################################
-target_link_libraries(yadoms yadoms-shared plugin_IPC interpreter_IPC script_IPC ${YADOMS_EXTERNAL_LINK} ${LIBS} ${CMAKE_DL_LIBS})
+target_link_libraries(yadoms
+   yadoms-shared
+   dbCommon
+   plugin_IPC
+   interpreter_IPC
+   script_IPC
+   ${YADOMS_EXTERNAL_LINK}
+   ${LIBS}
+   ${CMAKE_DL_LIBS}
+)
 
 ##################################################################################################
 ## RPATH

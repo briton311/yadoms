@@ -5,7 +5,7 @@
 #include "dataAccessLayer/IAcquisitionHistorizer.h"
 #include "dataAccessLayer/IDeviceManager.h"
 #include "dataAccessLayer/IKeywordManager.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 #include "database/IDataProvider.h"
 #include "IInstanceStateHandler.h"
 
@@ -31,7 +31,7 @@ namespace pluginSystem
       /// \param [in]   locationProvider           the location provider
       //-----------------------------------------------------
       CYPluginApiImplementation(boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformations,
-                                const boost::shared_ptr<const database::entities::CPlugin> instanceData,
+                                const boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                 const boost::filesystem::path& dataPath,
                                 boost::shared_ptr<IInstanceStateHandler> instanceStateHandler,
                                 boost::shared_ptr<database::IDataProvider> dataProvider,
@@ -117,7 +117,7 @@ namespace pluginSystem
       //--------------------------------------------------------------
       /// \brief			The database accessor
       //--------------------------------------------------------------
-      const boost::shared_ptr<const database::entities::CPlugin> m_instanceData;
+      const boost::shared_ptr<const dbCommon::entities::CPlugin> m_instanceData;
 
       //--------------------------------------------------------------
       /// \brief			The instance state handler

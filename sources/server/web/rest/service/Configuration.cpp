@@ -90,7 +90,7 @@ namespace web
                                                                        const std::string& requestContent) const
          {
             //get data from request content
-            database::entities::CConfiguration configToCreate;
+            dbCommon::entities::CConfiguration configToCreate;
             configToCreate.fillFromSerializedString(requestContent);
 
             //check that configuration entry do not already exists
@@ -110,7 +110,7 @@ namespace web
          {
             try
             {
-               database::entities::CConfiguration configToUpdate;
+               dbCommon::entities::CConfiguration configToUpdate;
                configToUpdate.fillFromSerializedString(requestContent);
 
                std::string section = "";
@@ -152,7 +152,7 @@ namespace web
          {
             try
             {
-               auto listToUpdate = shared::CDataContainer(requestContent).get<std::vector<boost::shared_ptr<database::entities::CConfiguration> > >(getRestKeyword());
+               auto listToUpdate = shared::CDataContainer(requestContent).get<std::vector<boost::shared_ptr<dbCommon::entities::CConfiguration> > >(getRestKeyword());
 
                for (auto i = listToUpdate.begin(); i != listToUpdate.end(); ++i)
                {
@@ -184,7 +184,7 @@ namespace web
 
             if (!section.empty() && !keyname.empty())
             {
-               database::entities::CConfiguration configToRemove;
+               dbCommon::entities::CConfiguration configToRemove;
                configToRemove.Section = section;
                configToRemove.Name = keyname;
                m_configurationManager->removeConfiguration(configToRemove);

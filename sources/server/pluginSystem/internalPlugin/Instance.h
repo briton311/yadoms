@@ -29,7 +29,7 @@ namespace pluginSystem
          /// \param[in] yPluginApi              yPluginApi context instance
          /// \param[in] instanceStateHandler    Instance state handler
          //--------------------------------------------------------------
-         CInstance(boost::shared_ptr<const database::entities::CPlugin> instanceInformation,
+         CInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceInformation,
                    boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                    boost::shared_ptr<yApi::IYPluginApi> api,
                    boost::shared_ptr<CInstanceStateHandler> instanceStateHandler);
@@ -43,7 +43,7 @@ namespace pluginSystem
          void updateConfiguration(const shared::CDataContainer& newConfiguration) override;
          void requestStop() override;
          void kill() override;
-         boost::shared_ptr<const database::entities::CPlugin> about() const override;
+         boost::shared_ptr<const dbCommon::entities::CPlugin> about() const override;
          boost::shared_ptr<const shared::plugin::information::IInformation> aboutPlugin() const override;
          void postDeviceCommand(boost::shared_ptr<const yApi::IDeviceCommand> deviceCommand) override;
          void postExtraQuery(boost::shared_ptr<yApi::IExtraQuery> extraQuery, const std::string& taskId) override;
@@ -72,7 +72,7 @@ namespace pluginSystem
                                              const std::string& commaSeparatedValues) const;
 
       private:
-         boost::shared_ptr<const database::entities::CPlugin> m_instanceInformation;
+         boost::shared_ptr<const dbCommon::entities::CPlugin> m_instanceInformation;
          boost::shared_ptr<const shared::plugin::information::IInformation> m_pluginInformation;
          boost::shared_ptr<shared::event::CEventHandler> m_eventHandler;
          boost::thread m_thread;

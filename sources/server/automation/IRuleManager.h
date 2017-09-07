@@ -1,5 +1,5 @@
 #pragma once
-#include "../database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
 namespace automation
 {
@@ -36,7 +36,7 @@ namespace automation
       ///\brief               Get all rules
       ///\return              The rule list
       //-----------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CRule> > getRules() const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CRule>> getRules() const = 0;
 
       //-----------------------------------------------------
       ///\brief               Create a new rule
@@ -44,7 +44,8 @@ namespace automation
       /// \param[in] code  Rule code
       ///\return              The new rule id
       //-----------------------------------------------------
-      virtual int createRule(boost::shared_ptr<const database::entities::CRule> ruleData, const std::string& code) = 0;
+      virtual int createRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData,
+                             const std::string& code) = 0;
 
       //--------------------------------------------------------------
       /// \brief           Get the rule informations
@@ -52,7 +53,7 @@ namespace automation
       /// \return          The rule informations, if available (empty string if not)
       /// \throw           CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<database::entities::CRule> getRule(int id) const = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CRule> getRule(int id) const = 0;
 
       //--------------------------------------------------------------
       /// \brief           Get the log of the rule
@@ -83,14 +84,15 @@ namespace automation
       /// \throw           CNotSupported if request to apply unsupported modifications
       /// \throw           CDatabaseException if fails
       //--------------------------------------------------------------
-      virtual void updateRule(boost::shared_ptr<const database::entities::CRule> ruleData) = 0;
+      virtual void updateRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData) = 0;
 
       //--------------------------------------------------------------
       /// \brief           Update rule informations
       /// \param[in] id    Rule Id
       /// \param[in] code  Rule code
       //--------------------------------------------------------------
-      virtual void updateRuleCode(int id, const std::string& code) = 0;
+      virtual void updateRuleCode(int id,
+                                  const std::string& code) = 0;
 
       //--------------------------------------------------------------
       /// \brief                          Delete a rule

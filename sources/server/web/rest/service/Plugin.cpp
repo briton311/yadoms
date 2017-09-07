@@ -126,7 +126,7 @@ namespace web
          shared::CDataContainer CPlugin::getAllPluginsInstanceForManualDeviceCreation(const std::vector<std::string>& parameters,
                                                                                       const std::string& requestContent) const
          {
-            std::vector<boost::shared_ptr<database::entities::CPlugin>> result;
+            std::vector<boost::shared_ptr<dbCommon::entities::CPlugin>> result;
 
             //liste de toutes les instances
             auto hwList = m_pluginManager->getInstanceList();
@@ -214,7 +214,7 @@ namespace web
          {
             try
             {
-               database::entities::CPlugin plugin;
+               dbCommon::entities::CPlugin plugin;
                plugin.fillFromSerializedString(requestContent);
                auto idCreated = m_pluginManager->createInstance(plugin);
 
@@ -236,7 +236,7 @@ namespace web
          {
             try
             {
-               database::entities::CPlugin instanceToUpdate;
+               dbCommon::entities::CPlugin instanceToUpdate;
                instanceToUpdate.fillFromSerializedString(requestContent);
 
                m_pluginManager->updateInstance(instanceToUpdate);

@@ -7,7 +7,7 @@
 namespace pluginSystem
 {
    CYPluginApiImplementation::CYPluginApiImplementation(boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformations,
-                                                        const boost::shared_ptr<const database::entities::CPlugin> instanceData,
+                                                        const boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                         const boost::filesystem::path& dataPath,
                                                         boost::shared_ptr<IInstanceStateHandler> instanceStateHandler,
                                                         boost::shared_ptr<database::IDataProvider> dataProvider,
@@ -216,7 +216,7 @@ namespace pluginSystem
 
    std::string CYPluginApiImplementation::getRecipientValue(int recipientId, const std::string& fieldName) const
    {
-      boost::shared_ptr<const database::entities::CRecipient> recipient = m_recipientRequester->getRecipient(recipientId);
+      boost::shared_ptr<const dbCommon::entities::CRecipient> recipient = m_recipientRequester->getRecipient(recipientId);
 
       // Search for from plugin fields
       for (auto itField = recipient->Fields().begin(); itField != recipient->Fields().end(); ++itField)
@@ -252,10 +252,10 @@ namespace pluginSystem
    {
       try
       {
-         boost::shared_ptr<const database::entities::CDevice> deviceEntity = m_deviceManager->getDeviceInPlugin(getPluginId(), device, true);
+         boost::shared_ptr<const dbCommon::entities::CDevice> deviceEntity = m_deviceManager->getDeviceInPlugin(getPluginId(), device, true);
          if (!deviceEntity->Blacklist())
          {
-            boost::shared_ptr<const database::entities::CKeyword> keywordEntity = m_keywordDataAccessLayer->getKeyword(deviceEntity->Id, data->getKeyword());
+            boost::shared_ptr<const dbCommon::entities::CKeyword> keywordEntity = m_keywordDataAccessLayer->getKeyword(deviceEntity->Id, data->getKeyword());
             if (!keywordEntity->Blacklist())
             {
                m_acquisitionHistorizer->saveData(keywordEntity->Id, *data);
@@ -282,14 +282,14 @@ namespace pluginSystem
       {
          std::vector<int> keywordIdList;
 
-         boost::shared_ptr<const database::entities::CDevice> deviceEntity = m_deviceManager->getDeviceInPlugin(getPluginId(), device, true);
+         boost::shared_ptr<const dbCommon::entities::CDevice> deviceEntity = m_deviceManager->getDeviceInPlugin(getPluginId(), device, true);
          if (!deviceEntity->Blacklist())
          {
             std::vector<boost::shared_ptr<const shared::plugin::yPluginApi::historization::IHistorizable>> dataVectFilter;
 
             for (auto iter = dataVect.begin(); iter != dataVect.end(); ++iter)
             {
-               boost::shared_ptr<const database::entities::CKeyword> keywordEntity = m_keywordDataAccessLayer->getKeyword(deviceEntity->Id, (*iter)->getKeyword());
+               boost::shared_ptr<const dbCommon::entities::CKeyword> keywordEntity = m_keywordDataAccessLayer->getKeyword(deviceEntity->Id, (*iter)->getKeyword());
                if (!keywordEntity->Blacklist())
                {
                   keywordIdList.push_back(keywordEntity->Id);

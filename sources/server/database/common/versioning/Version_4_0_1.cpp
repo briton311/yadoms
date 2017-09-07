@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Version_4_0_1.h"
-#include "database/common/Query.h"
-#include "database/common/DatabaseTables.h"
+#include <dbCommon/Query.h>
+#include <dbCommon/DatabaseTables.h>
 #include <shared/versioning/Version.h>
 #include "VersionException.h"
 #include <shared/Log.h>
@@ -24,7 +24,7 @@ namespace database
          }
 
          // ISQLiteVersionUpgrade implementation
-         void CVersion_4_0_1::checkForUpgrade(const boost::shared_ptr<IDatabaseRequester>& pRequester,
+         void CVersion_4_0_1::checkForUpgrade(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester,
                                               const shared::versioning::CVersion& currentVersion)
          {
             if (currentVersion < Version)
@@ -49,7 +49,7 @@ namespace database
          ///\param [in] pRequester : database requester object
          ///\throw      CVersionException if create database failed
          //-----------------------------------
-         void CVersion_4_0_1::UpdateFrom4_0_0(const boost::shared_ptr<IDatabaseRequester>& pRequester)
+         void CVersion_4_0_1::UpdateFrom4_0_0(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester)
          {
             try
             {
@@ -62,14 +62,14 @@ namespace database
                auto qUpdateKeyword = pRequester->newQuery();
 
                // Change the name from rssi to signalStrength
-               qUpdateKeyword.Update(CKeywordTable::getTableName()).
-                              Set(  CKeywordTable::getNameColumnName(), "signalPower",
-                                    CKeywordTable::getFriendlyNameColumnName(), "signalPower",
-                                    CKeywordTable::getCapacityNameColumnName(), "signalPower").
-                              Where(CKeywordTable::getNameColumnName(), CQUERY_OP_EQUAL, "rssi");
+               qUpdateKeyword.Update(dbCommon::CKeywordTable::getTableName()).
+                             Set(dbCommon::CKeywordTable::getNameColumnName(), "signalPower",
+                                 dbCommon::CKeywordTable::getFriendlyNameColumnName(), "signalPower",
+                                 dbCommon::CKeywordTable::getCapacityNameColumnName(), "signalPower").
+                             Where(dbCommon::CKeywordTable::getNameColumnName(), CQUERY_OP_EQUAL, "rssi");
 
                pRequester->queryStatement(qUpdateKeyword);
-               
+
                //set the database version
                updateDatabaseVersion(pRequester, Version);
 
@@ -92,3 +92,5 @@ namespace database
       } //namespace versioning
    } //namespace common
 } //namespace database 
+
+

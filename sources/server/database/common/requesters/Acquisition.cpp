@@ -1,14 +1,16 @@
 #include "stdafx.h"
 #include "Acquisition.h"
 #include <shared/exception/EmptyResult.hpp>
-#include "database/common/DatabaseTables.h"
-#include "database/common/Query.h"
-#include "database/common/adapters/DatabaseAdapters.h"
-#include "database/common/adapters/HighchartValueAdapter.hpp"
-#include "database/common/adapters/SingleValueAdapter.hpp"
-#include "database/common/adapters/MultipleValueAdapter.hpp"
-#include "database/DatabaseException.hpp"
+#include <dbCommon/DatabaseTables.h>
+#include <dbCommon/Query.h>
+#include <dbCommon/adapters/DatabaseAdapters.h>
+#include <dbCommon/adapters/HighchartValueAdapter.hpp>
+#include <dbCommon/adapters/SingleValueAdapter.hpp>
+#include <dbCommon/adapters/MultipleValueAdapter.hpp>
+#include <dbCommon/DatabaseException.hpp>
 #include "Keyword.h"
+
+//TODO déplacer dans dbCommon ?
 
 namespace database
 {
@@ -16,7 +18,7 @@ namespace database
    {
       namespace requesters
       {
-         CAcquisition::CAcquisition(boost::shared_ptr<IDatabaseRequester> databaseRequester, boost::shared_ptr<CKeyword> keywordRequester)
+         CAcquisition::CAcquisition(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester, boost::shared_ptr<CKeyword> keywordRequester)
             : m_keywordRequester(keywordRequester), m_databaseRequester(databaseRequester)
          {
          }
@@ -26,52 +28,51 @@ namespace database
          }
 
          // IAcquisitionRequester implementation
-         boost::shared_ptr<entities::CAcquisition> CAcquisition::saveData(const int keywordId, const std::string& data, boost::posix_time::ptime& dataTime)
+         boost::shared_ptr<dbCommon::entities::CAcquisition> CAcquisition::saveData(const int keywordId, const std::string& data, boost::posix_time::ptime& dataTime)
          {
             auto keywordEntity = m_keywordRequester->getKeyword(keywordId);
-            if(keywordEntity)
+            if (keywordEntity)
             {
                if (!keywordEntity->Blacklist())
                {
                   auto q = m_databaseRequester->newQuery();
-                  q.InsertInto(CAcquisitionTable::getTableName(), CAcquisitionTable::getDateColumnName(), CAcquisitionTable::getKeywordIdColumnName(), CAcquisitionTable::getValueColumnName()).
-                     Values(dataTime, keywordId, data);
+                  q.InsertInto(dbCommon::CAcquisitionTable::getTableName(), dbCommon::CAcquisitionTable::getDateColumnName(), dbCommon::CAcquisitionTable::getKeywordIdColumnName(), dbCommon::CAcquisitionTable::getValueColumnName()).
+                   Values(dataTime, keywordId, data);
 
                   try
                   {
                      if (m_databaseRequester->queryStatement(q) <= 0)
                         throw shared::exception::CEmptyResult("Fail to insert new data");
                   }
-                  catch(CDatabaseException& e)
+                  catch (dbCommon::CDatabaseException& e)
                   {
-                     if (e.returnCode() == CDatabaseException::kConstraintViolation)
+                     if (e.returnCode() == dbCommon::CDatabaseException::kConstraintViolation)
                      {
                         // Maybe 2 acquisitions were recorded at same time for same keyword. In this case, we prefer to keep last value
-                        q.Clear().Update(CAcquisitionTable::getTableName())
-                           .Set(CAcquisitionTable::getValueColumnName(), data)
-                           .Where(CAcquisitionTable::getDateColumnName(), CQUERY_OP_EQUAL, dataTime)
-                           .And(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
+                        q.Clear().Update(dbCommon::CAcquisitionTable::getTableName())
+                         .Set(dbCommon::CAcquisitionTable::getValueColumnName(), data)
+                         .Where(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_EQUAL, dataTime)
+                         .And(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
                         m_databaseRequester->queryStatement(q);
                      }
                      else
                      {
                         throw;
                      }
-                     
                   }
 
                   return getAcquisitionByKeywordAndDate(keywordId, dataTime);
-               } 
+               }
                else
                {
                   //blacklisted keyword
-                  return boost::shared_ptr<entities::CAcquisition>();
+                  return boost::shared_ptr<dbCommon::entities::CAcquisition>();
                }
             }
             throw shared::exception::CEmptyResult("The keyword do not exists, cannot add data");
          }
 
-         boost::shared_ptr<entities::CAcquisition> CAcquisition::incrementData(const int keywordId, const std::string& increment, boost::posix_time::ptime& dataTime)
+         boost::shared_ptr<dbCommon::entities::CAcquisition> CAcquisition::incrementData(const int keywordId, const std::string& increment, boost::posix_time::ptime& dataTime)
          {
             auto keywordEntity = m_keywordRequester->getKeyword(keywordId);
 
@@ -82,29 +83,29 @@ namespace database
                throw shared::exception::CEmptyResult("The keyword is not numeric, cannot increment data");
 
             if (keywordEntity->Blacklist())
-               return boost::shared_ptr<entities::CAcquisition>(); //return null instead of exception for performances
+               return boost::shared_ptr<dbCommon::entities::CAcquisition>(); //return null instead of exception for performances
 
             auto qLastKeywordValue = m_databaseRequester->newQuery();
-            qLastKeywordValue.Select(qLastKeywordValue.castNumeric(CAcquisitionTable::getValueColumnName())).
-                             From(CAcquisitionTable::getTableName()).
-                             Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                             OrderBy(CAcquisitionTable::getDateColumnName(), CQuery::kDesc).
+            qLastKeywordValue.Select(qLastKeywordValue.castNumeric(dbCommon::CAcquisitionTable::getValueColumnName())).
+                             From(dbCommon::CAcquisitionTable::getTableName()).
+                             Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                             OrderBy(dbCommon::CAcquisitionTable::getDateColumnName(), dbCommon::CQuery::kDesc).
                              Limit(1);
 
             auto q = m_databaseRequester->newQuery();
 
 
             //insert first (if fails, update )
-            q.InsertInto(CAcquisitionTable::getTableName(), CAcquisitionTable::getDateColumnName(), CAcquisitionTable::getKeywordIdColumnName(), CAcquisitionTable::getValueColumnName()).
+            q.InsertInto(dbCommon::CAcquisitionTable::getTableName(), dbCommon::CAcquisitionTable::getDateColumnName(), dbCommon::CAcquisitionTable::getKeywordIdColumnName(), dbCommon::CAcquisitionTable::getValueColumnName()).
              Values(dataTime, keywordId, q.math(q.coalesce(qLastKeywordValue, 0), CQUERY_OP_PLUS, increment));
 
             if (m_databaseRequester->queryStatement(q, false) <= 0)
             {
                //update
-               q.Clear().Update(CAcquisitionTable::getTableName())
-                .Set(CAcquisitionTable::getValueColumnName(), q.math(q.coalesce(qLastKeywordValue, 0), CQUERY_OP_PLUS, increment)).
-                Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_EQUAL, dataTime);
+               q.Clear().Update(dbCommon::CAcquisitionTable::getTableName())
+                .Set(dbCommon::CAcquisitionTable::getValueColumnName(), q.math(q.coalesce(qLastKeywordValue, 0), CQUERY_OP_PLUS, increment)).
+                Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_EQUAL, dataTime);
 
                if (m_databaseRequester->queryStatement(q) <= 0)
                   throw shared::exception::CEmptyResult("Fail to insert new incremental data");
@@ -118,14 +119,14 @@ namespace database
             if (m_keywordRequester->getKeyword(keywordId))
             {
                auto q = m_databaseRequester->newQuery();
-               q.DeleteFrom(CAcquisitionTable::getTableName()).
-                Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
+               q.DeleteFrom(dbCommon::CAcquisitionTable::getTableName()).
+                Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
 
                m_databaseRequester->queryStatement(q);
 
                auto qSummary = m_databaseRequester->newQuery();
-               qSummary.DeleteFrom(CAcquisitionSummaryTable::getTableName()).
-                       Where(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
+               qSummary.DeleteFrom(dbCommon::CAcquisitionSummaryTable::getTableName()).
+                       Where(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
                m_databaseRequester->queryStatement(qSummary);
             }
             else
@@ -134,15 +135,15 @@ namespace database
             }
          }
 
-         boost::shared_ptr<entities::CAcquisition> CAcquisition::getAcquisitionByKeywordAndDate(const int keywordId, boost::posix_time::ptime time)
+         boost::shared_ptr<dbCommon::entities::CAcquisition> CAcquisition::getAcquisitionByKeywordAndDate(const int keywordId, boost::posix_time::ptime time)
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CAcquisitionTable::getTableName()).
-                   Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                   And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_EQUAL, time);
+                   From(dbCommon::CAcquisitionTable::getTableName()).
+                   Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                   And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_EQUAL, time);
 
-            adapters::CAcquisitionAdapter adapter;
+            dbCommon::adapters::CAcquisitionAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
 
             if (adapter.getResults().size() >= 1)
@@ -153,16 +154,16 @@ namespace database
             throw shared::exception::CEmptyResult((boost::format("Cannot retrieve acquisition for KeywordId=%1% and date=%2%  in database") % keywordId % time).str());
          }
 
-         boost::shared_ptr<entities::CAcquisition> CAcquisition::getKeywordLastData(const int keywordId, bool throwIfNotExists)
+         boost::shared_ptr<dbCommon::entities::CAcquisition> CAcquisition::getKeywordLastData(const int keywordId, bool throwIfNotExists)
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CAcquisitionTable::getTableName()).
-                   Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                   OrderBy(CAcquisitionTable::getDateColumnName(), CQuery::kDesc).
+                   From(dbCommon::CAcquisitionTable::getTableName()).
+                   Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                   OrderBy(dbCommon::CAcquisitionTable::getDateColumnName(), dbCommon::CQuery::kDesc).
                    Limit(1);
 
-            adapters::CAcquisitionAdapter adapter;
+            dbCommon::adapters::CAcquisitionAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
 
             if (adapter.getResults().size() >= 1)
@@ -173,79 +174,79 @@ namespace database
             {
                throw shared::exception::CEmptyResult((boost::format("Cannot retrieve any acquisition for the keyword id=%1% in database") % keywordId).str());
             }
-            return boost::shared_ptr<entities::CAcquisition>();
+            return boost::shared_ptr<dbCommon::entities::CAcquisition>();
          }
 
-         std::vector<boost::tuple<boost::posix_time::ptime, std::string> > CAcquisition::getKeywordData(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
+         std::vector<boost::tuple<boost::posix_time::ptime, std::string>> CAcquisition::getKeywordData(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
             auto qSelect = m_databaseRequester->newQuery();
-            qSelect.Select(CAcquisitionTable::getDateColumnName(), CAcquisitionTable::getValueColumnName()).
-                   From(CAcquisitionTable::getTableName()).
-                   Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
+            qSelect.Select(dbCommon::CAcquisitionTable::getDateColumnName(), dbCommon::CAcquisitionTable::getValueColumnName()).
+                   From(dbCommon::CAcquisitionTable::getTableName()).
+                   Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
 
             if (!timeFrom.is_not_a_date_time())
             {
-               qSelect.And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
+               qSelect.And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
                if (!timeTo.is_not_a_date_time())
                {
-                  qSelect.And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
+                  qSelect.And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
                }
             }
 
-            qSelect.OrderBy(CAcquisitionTable::getDateColumnName());
+            qSelect.OrderBy(dbCommon::CAcquisitionTable::getDateColumnName());
 
-            adapters::CMultipleValueAdapter<boost::posix_time::ptime, std::string> mva;
+            dbCommon::adapters::CMultipleValueAdapter<boost::posix_time::ptime, std::string> mva;
             m_databaseRequester->queryEntities(&mva, qSelect);
 
             return mva.getResults();
          }
 
-         std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > CAcquisition::getKeywordDataByHour(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
+         std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> CAcquisition::getKeywordDataByHour(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordSummaryDataByType(entities::EAcquisitionSummaryType::kHour, keywordId, timeFrom, timeTo);
+            return getKeywordSummaryDataByType(dbCommon::entities::EAcquisitionSummaryType::kHour, keywordId, timeFrom, timeTo);
          }
 
-         std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > CAcquisition::getKeywordDataByDay(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
+         std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> CAcquisition::getKeywordDataByDay(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordSummaryDataByType(entities::EAcquisitionSummaryType::kDay, keywordId, timeFrom, timeTo);
+            return getKeywordSummaryDataByType(dbCommon::entities::EAcquisitionSummaryType::kDay, keywordId, timeFrom, timeTo);
          }
 
-         std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > CAcquisition::getKeywordDataByMonth(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
+         std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> CAcquisition::getKeywordDataByMonth(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordSummaryDataByType(entities::EAcquisitionSummaryType::kMonth, keywordId, timeFrom, timeTo);
+            return getKeywordSummaryDataByType(dbCommon::entities::EAcquisitionSummaryType::kMonth, keywordId, timeFrom, timeTo);
          }
 
-         std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > CAcquisition::getKeywordDataByYear(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
+         std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> CAcquisition::getKeywordDataByYear(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordSummaryDataByType(entities::EAcquisitionSummaryType::kYear, keywordId, timeFrom, timeTo);
+            return getKeywordSummaryDataByType(dbCommon::entities::EAcquisitionSummaryType::kYear, keywordId, timeFrom, timeTo);
          }
 
-         std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > CAcquisition::getKeywordSummaryDataByType(const entities::EAcquisitionSummaryType& type, int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo) const
+         std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> CAcquisition::getKeywordSummaryDataByType(const dbCommon::entities::EAcquisitionSummaryType& type, int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo) const
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CAcquisitionSummaryTable::getTableName()).
-                   Where(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                   And(CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, type);
+                   From(dbCommon::CAcquisitionSummaryTable::getTableName()).
+                   Where(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                   And(dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, type);
 
             if (!timeFrom.is_not_a_date_time())
             {
-               qSelect.And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
+               qSelect.And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
                if (!timeTo.is_not_a_date_time())
                {
-                  qSelect.And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
+                  qSelect.And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
                }
             }
 
-            qSelect.OrderBy(CAcquisitionSummaryTable::getDateColumnName());
+            qSelect.OrderBy(dbCommon::CAcquisitionSummaryTable::getDateColumnName());
 
-            if (type == entities::EAcquisitionSummaryType::kDay)
+            if (type == dbCommon::entities::EAcquisitionSummaryType::kDay)
                qSelect.Limit(2000); //more than 5 years
             else
                qSelect.Limit(200); // more than 8 days
 
 
-            adapters::CAcquisitionSummaryAdapter adapter;
+            dbCommon::adapters::CAcquisitionSummaryAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
 
             return adapter.getResults();
@@ -256,48 +257,48 @@ namespace database
             //this query is optimized to get only one field to read
             //the output data is a single column (without brackets):  ["dateiso",value]
             auto qSelect = m_databaseRequester->newQuery();
-            qSelect.Select(qSelect.concatenate(qSelect.dateToIsoString(CAcquisitionTable::getDateColumnName()), ",", CAcquisitionTable::getValueColumnName())).
-                   From(CAcquisitionTable::getTableName()).
-                   Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
+            qSelect.Select(qSelect.concatenate(qSelect.dateToIsoString(dbCommon::CAcquisitionTable::getDateColumnName()), ",", dbCommon::CAcquisitionTable::getValueColumnName())).
+                   From(dbCommon::CAcquisitionTable::getTableName()).
+                   Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId);
 
             if (!timeFrom.is_not_a_date_time())
             {
-               qSelect.And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
+               qSelect.And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
                if (!timeTo.is_not_a_date_time())
                {
-                  qSelect.And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
+                  qSelect.And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
                }
             }
 
-            qSelect.OrderBy(CAcquisitionTable::getDateColumnName());
-            adapters::CHighchartValueAdapter mva;
+            qSelect.OrderBy(dbCommon::CAcquisitionTable::getDateColumnName());
+            dbCommon::adapters::CHighchartValueAdapter mva;
 
             m_databaseRequester->queryEntities(&mva, qSelect);
 
             return mva.getRawResults();
          }
 
-         std::string CAcquisition::getKeywordHighchartDataByType(const entities::EAcquisitionSummaryType& type, int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo) const
+         std::string CAcquisition::getKeywordHighchartDataByType(const dbCommon::entities::EAcquisitionSummaryType& type, int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo) const
          {
             //this query is optimized to get only one field to read
             //the output data is a single column (without brackets):  ["dateiso",value]
             auto qSelect = m_databaseRequester->newQuery();
-            qSelect.Select(qSelect.concatenate(qSelect.dateToIsoString(CAcquisitionSummaryTable::getDateColumnName()), ",", CAcquisitionSummaryTable::getAvgColumnName())).
-                   From(CAcquisitionSummaryTable::getTableName()).
-                   Where(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                   And(CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, type);
+            qSelect.Select(qSelect.concatenate(qSelect.dateToIsoString(dbCommon::CAcquisitionSummaryTable::getDateColumnName()), ",", dbCommon::CAcquisitionSummaryTable::getAvgColumnName())).
+                   From(dbCommon::CAcquisitionSummaryTable::getTableName()).
+                   Where(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                   And(dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, type);
 
             if (!timeFrom.is_not_a_date_time())
             {
-               qSelect.And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
+               qSelect.And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom);
                if (!timeTo.is_not_a_date_time())
                {
-                  qSelect.And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
+                  qSelect.And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, timeTo);
                }
             }
 
-            qSelect.OrderBy(CAcquisitionSummaryTable::getDateColumnName());
-            adapters::CHighchartValueAdapter mva;
+            qSelect.OrderBy(dbCommon::CAcquisitionSummaryTable::getDateColumnName());
+            dbCommon::adapters::CHighchartValueAdapter mva;
 
             m_databaseRequester->queryEntities(&mva, qSelect);
 
@@ -306,22 +307,22 @@ namespace database
 
          std::string CAcquisition::getKeywordHighchartDataByHour(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordHighchartDataByType(entities::EAcquisitionSummaryType::kHour, keywordId, timeFrom, timeTo);
+            return getKeywordHighchartDataByType(dbCommon::entities::EAcquisitionSummaryType::kHour, keywordId, timeFrom, timeTo);
          }
 
          std::string CAcquisition::getKeywordHighchartDataByDay(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordHighchartDataByType(entities::EAcquisitionSummaryType::kDay, keywordId, timeFrom, timeTo);
+            return getKeywordHighchartDataByType(dbCommon::entities::EAcquisitionSummaryType::kDay, keywordId, timeFrom, timeTo);
          }
 
          std::string CAcquisition::getKeywordHighchartDataByMonth(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordHighchartDataByType(entities::EAcquisitionSummaryType::kMonth, keywordId, timeFrom, timeTo);
+            return getKeywordHighchartDataByType(dbCommon::entities::EAcquisitionSummaryType::kMonth, keywordId, timeFrom, timeTo);
          }
 
          std::string CAcquisition::getKeywordHighchartDataByYear(int keywordId, boost::posix_time::ptime timeFrom, boost::posix_time::ptime timeTo)
          {
-            return getKeywordHighchartDataByType(entities::EAcquisitionSummaryType::kYear, keywordId, timeFrom, timeTo);
+            return getKeywordHighchartDataByType(dbCommon::entities::EAcquisitionSummaryType::kYear, keywordId, timeFrom, timeTo);
          }
 
          void CAcquisition::getKeywordsHavingDate(const boost::posix_time::ptime& timeFrom, const boost::posix_time::ptime& timeTo, std::vector<int>& results)
@@ -335,17 +336,17 @@ namespace database
       
             */
             auto q = m_databaseRequester->newQuery();
-            q.Select(q.distinct(CAcquisitionTable::getKeywordIdColumnName()))
-             .From(CAcquisitionTable::getTableName())
-             .Where(CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom)
-             .And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF, timeTo);
+            q.Select(q.distinct(dbCommon::CAcquisitionTable::getKeywordIdColumnName()))
+             .From(dbCommon::CAcquisitionTable::getTableName())
+             .Where(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, timeFrom)
+             .And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF, timeTo);
 
-            database::common::adapters::CSingleValueAdapterWithContainer<int> intVectorAdapter(results);
+            dbCommon::adapters::CSingleValueAdapterWithContainer<int> intVectorAdapter(results);
             m_databaseRequester->queryEntities(&intVectorAdapter, q);
          }
 
 
-         boost::shared_ptr<entities::CAcquisitionSummary> CAcquisition::saveSummaryData(const int keywordId, database::entities::EAcquisitionSummaryType curType, boost::posix_time::ptime& dataTime)
+         boost::shared_ptr<dbCommon::entities::CAcquisitionSummary> CAcquisition::saveSummaryData(const int keywordId, dbCommon::entities::EAcquisitionSummaryType curType, boost::posix_time::ptime& dataTime)
          {
             /* 
             INSERT OR REPLACE INTO AcquisitionSummary (type, date, keywordId, mean, min, max)
@@ -384,7 +385,7 @@ namespace database
                   //Hour summary data are commputed from raw acquisitions
                   //Other ones, are taken from summarydata (really simplify calculous, and queries)
 
-                  if (curType == database::entities::EAcquisitionSummaryType::kHour)
+                  if (curType == dbCommon::entities::EAcquisitionSummaryType::kHour)
                   {
                      fromDate = boost::posix_time::ptime(dataTime.date(), boost::posix_time::hours(pt_tm.tm_hour));
                      toDate = boost::posix_time::ptime(dataTime.date(), boost::posix_time::hours(pt_tm.tm_hour) + boost::posix_time::minutes(59) + boost::posix_time::seconds(59));
@@ -393,14 +394,14 @@ namespace database
                      {
                         //process the request
                         auto q = m_databaseRequester->newQuery();
-                        q.InsertOrReplaceInto(CAcquisitionSummaryTable::getTableName(), CAcquisitionSummaryTable::getTypeColumnName(), CAcquisitionSummaryTable::getDateColumnName(), CAcquisitionSummaryTable::getKeywordIdColumnName(), CAcquisitionSummaryTable::getAvgColumnName(), CAcquisitionSummaryTable::getMinColumnName(), CAcquisitionSummaryTable::getMaxColumnName()).
-                         Select(curType, fromDate, keywordId, q.averageWithCast(q.fromSubquery("acq", CAcquisitionTable::getValueColumnName())),
-                                q.minWithCast(q.fromSubquery("acq", CAcquisitionTable::getValueColumnName())),
-                                q.maxWithCast(q.fromSubquery("acq", CAcquisitionTable::getValueColumnName()))).
-                         From(q.as(CAcquisitionTable::getTableName(), "acq")).
-                         Where(q.fromSubquery("acq", CAcquisitionTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
-                         And(q.fromSubquery("acq", CAcquisitionTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
-                         And(q.fromSubquery("acq", CAcquisitionTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
+                        q.InsertOrReplaceInto(dbCommon::CAcquisitionSummaryTable::getTableName(), dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), dbCommon::CAcquisitionSummaryTable::getDateColumnName(), dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), dbCommon::CAcquisitionSummaryTable::getAvgColumnName(), dbCommon::CAcquisitionSummaryTable::getMinColumnName(), dbCommon::CAcquisitionSummaryTable::getMaxColumnName()).
+                         Select(curType, fromDate, keywordId, q.averageWithCast(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getValueColumnName())),
+                                q.minWithCast(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getValueColumnName())),
+                                q.maxWithCast(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getValueColumnName()))).
+                         From(q.as(dbCommon::CAcquisitionTable::getTableName(), "acq")).
+                         Where(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
+                         And(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
+                         And(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
                         if (m_databaseRequester->queryStatement(q) <= 0)
                            throw shared::exception::CEmptyResult("Fail to insert summary value (insert or update) " + curType.toString() + " data");
                      }
@@ -409,40 +410,40 @@ namespace database
                         //update
                         auto compute = m_databaseRequester->newQuery();
 
-                        compute.Select(compute.as(compute.averageWithCast(CAcquisitionTable::getValueColumnName()), "avg"),
-                                       compute.as(compute.minWithCast(CAcquisitionTable::getValueColumnName()), "min"),
-                                       compute.as(compute.maxWithCast(CAcquisitionTable::getValueColumnName()), "max")).
-                               From(CAcquisitionTable::getTableName()).
-                               Where(CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                               And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, fromDate).
-                               And(CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, toDate);
+                        compute.Select(compute.as(compute.averageWithCast(dbCommon::CAcquisitionTable::getValueColumnName()), "avg"),
+                                       compute.as(compute.minWithCast(dbCommon::CAcquisitionTable::getValueColumnName()), "min"),
+                                       compute.as(compute.maxWithCast(dbCommon::CAcquisitionTable::getValueColumnName()), "max")).
+                               From(dbCommon::CAcquisitionTable::getTableName()).
+                               Where(dbCommon::CAcquisitionTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                               And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, fromDate).
+                               And(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, toDate);
 
                         auto q = m_databaseRequester->newQuery();
 
 
                         q.With("acq", compute).
-                         Update(CAcquisitionSummaryTable::getTableName())
-                         .Set(CAcquisitionSummaryTable::getAvgColumnName(), q.fromSubquery("acq", "avg"),
-                              CAcquisitionSummaryTable::getMinColumnName(), q.fromSubquery("acq", "min"),
-                              CAcquisitionSummaryTable::getMaxColumnName(), q.fromSubquery("acq", "max"))
+                         Update(dbCommon::CAcquisitionSummaryTable::getTableName())
+                         .Set(dbCommon::CAcquisitionSummaryTable::getAvgColumnName(), q.fromSubquery("acq", "avg"),
+                              dbCommon::CAcquisitionSummaryTable::getMinColumnName(), q.fromSubquery("acq", "min"),
+                              dbCommon::CAcquisitionSummaryTable::getMaxColumnName(), q.fromSubquery("acq", "max"))
                          .FromWith("acq")
-                         .Where(CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, curType.toString())
-                         .And(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId)
-                         .And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_EQUAL, fromDate);
+                         .Where(dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, curType.toString())
+                         .And(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId)
+                         .And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_EQUAL, fromDate);
 
                         if (m_databaseRequester->queryStatement(q) <= 0)
                         {
                            //fail to update, then insert
                            //insert
                            q.Clear();
-                           q.InsertInto(CAcquisitionSummaryTable::getTableName(), CAcquisitionSummaryTable::getTypeColumnName(), CAcquisitionSummaryTable::getDateColumnName(), CAcquisitionSummaryTable::getKeywordIdColumnName(), CAcquisitionSummaryTable::getAvgColumnName(), CAcquisitionSummaryTable::getMinColumnName(), CAcquisitionSummaryTable::getMaxColumnName()).
-                            Select(curType, fromDate, keywordId, q.averageWithCast(q.fromSubquery("acq", CAcquisitionTable::getValueColumnName())),
-                                   q.minWithCast(q.fromSubquery("acq", CAcquisitionTable::getValueColumnName())),
-                                   q.maxWithCast(q.fromSubquery("acq", CAcquisitionTable::getValueColumnName()))).
-                            From(q.as(CAcquisitionTable::getTableName(), "acq")).
-                            Where(q.fromSubquery("acq", CAcquisitionTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
-                            And(q.fromSubquery("acq", CAcquisitionTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
-                            And(q.fromSubquery("acq", CAcquisitionTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
+                           q.InsertInto(dbCommon::CAcquisitionSummaryTable::getTableName(), dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), dbCommon::CAcquisitionSummaryTable::getDateColumnName(), dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), dbCommon::CAcquisitionSummaryTable::getAvgColumnName(), dbCommon::CAcquisitionSummaryTable::getMinColumnName(), dbCommon::CAcquisitionSummaryTable::getMaxColumnName()).
+                            Select(curType, fromDate, keywordId, q.averageWithCast(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getValueColumnName())),
+                                   q.minWithCast(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getValueColumnName())),
+                                   q.maxWithCast(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getValueColumnName()))).
+                            From(q.as(dbCommon::CAcquisitionTable::getTableName(), "acq")).
+                            Where(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
+                            And(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
+                            And(q.fromSubquery("acq", dbCommon::CAcquisitionTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
 
                            if (m_databaseRequester->queryStatement(q) <= 0)
                               throw shared::exception::CEmptyResult("Fail to insert summary value " + curType.toString() + " data");
@@ -451,19 +452,19 @@ namespace database
                   }
                   else
                   {
-                     database::entities::EAcquisitionSummaryType toQuery;
+                     dbCommon::entities::EAcquisitionSummaryType toQuery;
 
                      //all types but Hour
                      switch (curType)
                      {
-                     case database::entities::EAcquisitionSummaryType::kDayValue:
+                     case dbCommon::entities::EAcquisitionSummaryType::kDayValue:
                         fromDate = boost::posix_time::ptime(dataTime.date());
                         toDate = boost::posix_time::ptime(dataTime.date(),
                                                           boost::posix_time::hours(23) + boost::posix_time::minutes(59) + boost::posix_time::seconds(59));
-                        toQuery = database::entities::EAcquisitionSummaryType::kHour;
+                        toQuery = dbCommon::entities::EAcquisitionSummaryType::kHour;
                         break;
 
-                     case database::entities::EAcquisitionSummaryType::kMonthValue:
+                     case dbCommon::entities::EAcquisitionSummaryType::kMonthValue:
                         fromDate = boost::posix_time::ptime(boost::gregorian::date(dataTime.date().year(),
                                                                                    dataTime.date().month(),
                                                                                    1));
@@ -472,10 +473,10 @@ namespace database
                                                                                  boost::gregorian::gregorian_calendar::end_of_month_day(dataTime.date().year(),
                                                                                                                                         dataTime.date().month())),
                                                           boost::posix_time::hours(23) + boost::posix_time::minutes(59) + boost::posix_time::seconds(59));
-                        toQuery = database::entities::EAcquisitionSummaryType::kDay;
+                        toQuery = dbCommon::entities::EAcquisitionSummaryType::kDay;
                         break;
 
-                     case database::entities::EAcquisitionSummaryType::kYearValue:
+                     case dbCommon::entities::EAcquisitionSummaryType::kYearValue:
                         fromDate = boost::posix_time::ptime(boost::gregorian::date(dataTime.date().year(),
                                                                                    1,
                                                                                    1));
@@ -483,7 +484,7 @@ namespace database
                                                                                  12,
                                                                                  boost::gregorian::gregorian_calendar::end_of_month_day(dataTime.date().year(), 12)),
                                                           boost::posix_time::hours(23) + boost::posix_time::minutes(59) + boost::posix_time::seconds(59));
-                        toQuery = database::entities::EAcquisitionSummaryType::kMonth;
+                        toQuery = dbCommon::entities::EAcquisitionSummaryType::kMonth;
                         break;
                      }
 
@@ -491,15 +492,15 @@ namespace database
                      if (m_databaseRequester->supportInsertOrUpdateStatement())
                      {
                         auto q = m_databaseRequester->newQuery();
-                        q.InsertOrReplaceInto(CAcquisitionSummaryTable::getTableName(), CAcquisitionSummaryTable::getTypeColumnName(), CAcquisitionSummaryTable::getDateColumnName(), CAcquisitionSummaryTable::getKeywordIdColumnName(), CAcquisitionSummaryTable::getAvgColumnName(), CAcquisitionSummaryTable::getMinColumnName(), CAcquisitionSummaryTable::getMaxColumnName()).
-                         Select(curType, fromDate, keywordId, q.average(q.fromSubquery("acq", CAcquisitionSummaryTable::getAvgColumnName())),
-                                q.min(q.fromSubquery("acq", CAcquisitionSummaryTable::getMinColumnName())),
-                                q.max(q.fromSubquery("acq", CAcquisitionSummaryTable::getMaxColumnName()))).
-                         From(q.as(CAcquisitionSummaryTable::getTableName(), "acq")).
-                         Where(q.fromSubquery("acq", CAcquisitionSummaryTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
-                         And(q.fromSubquery("acq", CAcquisitionSummaryTable::getTypeColumnName()), CQUERY_OP_EQUAL, toQuery.toString()).
-                         And(q.fromSubquery("acq", CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
-                         And(q.fromSubquery("acq", CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
+                        q.InsertOrReplaceInto(dbCommon::CAcquisitionSummaryTable::getTableName(), dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), dbCommon::CAcquisitionSummaryTable::getDateColumnName(), dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), dbCommon::CAcquisitionSummaryTable::getAvgColumnName(), dbCommon::CAcquisitionSummaryTable::getMinColumnName(), dbCommon::CAcquisitionSummaryTable::getMaxColumnName()).
+                         Select(curType, fromDate, keywordId, q.average(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getAvgColumnName())),
+                                q.min(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getMinColumnName())),
+                                q.max(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getMaxColumnName()))).
+                         From(q.as(dbCommon::CAcquisitionSummaryTable::getTableName(), "acq")).
+                         Where(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
+                         And(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getTypeColumnName()), CQUERY_OP_EQUAL, toQuery.toString()).
+                         And(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
+                         And(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
 
                         if (m_databaseRequester->queryStatement(q) <= 0)
                            throw shared::exception::CEmptyResult("Fail to insert summary value (insert or update) " + curType.toString() + " data");
@@ -509,41 +510,41 @@ namespace database
                         //update
                         auto compute = m_databaseRequester->newQuery();
 
-                        compute.Select(compute.as(compute.average(CAcquisitionSummaryTable::getAvgColumnName()), "avg"),
-                                       compute.as(compute.min(CAcquisitionSummaryTable::getMinColumnName()), "min"),
-                                       compute.as(compute.max(CAcquisitionSummaryTable::getMaxColumnName()), "max")).
-                               From(CAcquisitionSummaryTable::getTableName()).
-                               Where(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                               And(CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, toQuery.toString()).
-                               And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, fromDate).
-                               And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, toDate);
+                        compute.Select(compute.as(compute.average(dbCommon::CAcquisitionSummaryTable::getAvgColumnName()), "avg"),
+                                       compute.as(compute.min(dbCommon::CAcquisitionSummaryTable::getMinColumnName()), "min"),
+                                       compute.as(compute.max(dbCommon::CAcquisitionSummaryTable::getMaxColumnName()), "max")).
+                               From(dbCommon::CAcquisitionSummaryTable::getTableName()).
+                               Where(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                               And(dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, toQuery.toString()).
+                               And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_SUP_EQUAL, fromDate).
+                               And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_INF_EQUAL, toDate);
 
                         auto q = m_databaseRequester->newQuery();
 
                         q.With("acq", compute).
-                         Update(CAcquisitionSummaryTable::getTableName())
-                         .Set(CAcquisitionSummaryTable::getAvgColumnName(), q.fromSubquery("acq", "avg"),
-                              CAcquisitionSummaryTable::getMinColumnName(), q.fromSubquery("acq", "min"),
-                              CAcquisitionSummaryTable::getMaxColumnName(), q.fromSubquery("acq", "max"))
+                         Update(dbCommon::CAcquisitionSummaryTable::getTableName())
+                         .Set(dbCommon::CAcquisitionSummaryTable::getAvgColumnName(), q.fromSubquery("acq", "avg"),
+                              dbCommon::CAcquisitionSummaryTable::getMinColumnName(), q.fromSubquery("acq", "min"),
+                              dbCommon::CAcquisitionSummaryTable::getMaxColumnName(), q.fromSubquery("acq", "max"))
                          .FromWith("acq")
-                         .Where(CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, curType.toString())
-                         .And(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId)
-                         .And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_EQUAL, fromDate);
+                         .Where(dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, curType.toString())
+                         .And(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId)
+                         .And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_EQUAL, fromDate);
 
                         if (m_databaseRequester->queryStatement(q) <= 0)
                         {
                            //fail to update, then insert
                            //insert
                            q.Clear();
-                           q.InsertInto(CAcquisitionSummaryTable::getTableName(), CAcquisitionSummaryTable::getTypeColumnName(), CAcquisitionSummaryTable::getDateColumnName(), CAcquisitionSummaryTable::getKeywordIdColumnName(), CAcquisitionSummaryTable::getAvgColumnName(), CAcquisitionSummaryTable::getMinColumnName(), CAcquisitionSummaryTable::getMaxColumnName()).
-                            Select(curType, fromDate, keywordId, q.average(q.fromSubquery("acq", CAcquisitionSummaryTable::getAvgColumnName())),
-                                   q.min(q.fromSubquery("acq", CAcquisitionSummaryTable::getMinColumnName())),
-                                   q.max(q.fromSubquery("acq", CAcquisitionSummaryTable::getMaxColumnName()))).
-                            From(q.as(CAcquisitionSummaryTable::getTableName(), "acq")).
-                            Where(q.fromSubquery("acq", CAcquisitionSummaryTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
-                            And(q.fromSubquery("acq", CAcquisitionSummaryTable::getTypeColumnName()), CQUERY_OP_EQUAL, toQuery.toString()).
-                            And(q.fromSubquery("acq", CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
-                            And(q.fromSubquery("acq", CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
+                           q.InsertInto(dbCommon::CAcquisitionSummaryTable::getTableName(), dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), dbCommon::CAcquisitionSummaryTable::getDateColumnName(), dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), dbCommon::CAcquisitionSummaryTable::getAvgColumnName(), dbCommon::CAcquisitionSummaryTable::getMinColumnName(), dbCommon::CAcquisitionSummaryTable::getMaxColumnName()).
+                            Select(curType, fromDate, keywordId, q.average(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getAvgColumnName())),
+                                   q.min(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getMinColumnName())),
+                                   q.max(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getMaxColumnName()))).
+                            From(q.as(dbCommon::CAcquisitionSummaryTable::getTableName(), "acq")).
+                            Where(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName()), CQUERY_OP_EQUAL, keywordId).
+                            And(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getTypeColumnName()), CQUERY_OP_EQUAL, toQuery.toString()).
+                            And(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_SUP_EQUAL, fromDate).
+                            And(q.fromSubquery("acq", dbCommon::CAcquisitionSummaryTable::getDateColumnName()), CQUERY_OP_INF_EQUAL, toDate);
 
                            if (m_databaseRequester->queryStatement(q) <= 0)
                               throw shared::exception::CEmptyResult("Fail to insert summary value " + curType.toString() + " data");
@@ -552,22 +553,22 @@ namespace database
                   }
 
                   //get the result
-                  std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > all;
+                  std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> all;
                   switch (curType)
                   {
-                  case database::entities::EAcquisitionSummaryType::kHourValue:
+                  case dbCommon::entities::EAcquisitionSummaryType::kHourValue:
                      all = getKeywordDataByHour(keywordId, fromDate, toDate);
                      break;
 
-                  case database::entities::EAcquisitionSummaryType::kDayValue:
+                  case dbCommon::entities::EAcquisitionSummaryType::kDayValue:
                      all = getKeywordDataByDay(keywordId, fromDate, toDate);
                      break;
 
-                  case database::entities::EAcquisitionSummaryType::kMonthValue:
+                  case dbCommon::entities::EAcquisitionSummaryType::kMonthValue:
                      all = getKeywordDataByMonth(keywordId, fromDate, toDate);
                      break;
 
-                  case database::entities::EAcquisitionSummaryType::kYearValue:
+                  case dbCommon::entities::EAcquisitionSummaryType::kYearValue:
                      all = getKeywordDataByYear(keywordId, fromDate, toDate);
                      break;
                   }
@@ -575,31 +576,31 @@ namespace database
                      return all[0];
                }
                //keyword is not numeric, no data to avg, min and max !
-               return boost::shared_ptr<entities::CAcquisitionSummary>();
+               return boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>();
             }
             throw shared::exception::CEmptyResult("The keyword do not exists, cannot add summary data");
          }
 
-         bool CAcquisition::summaryDataExists(const int keywordId, entities::EAcquisitionSummaryType curType, boost::posix_time::ptime& dataTime)
+         bool CAcquisition::summaryDataExists(const int keywordId, dbCommon::entities::EAcquisitionSummaryType curType, boost::posix_time::ptime& dataTime)
          {
             //determine the real date of summary data 
             boost::posix_time::ptime fromDate;
             auto pt_tm = boost::posix_time::to_tm(dataTime);
-            if (curType == database::entities::EAcquisitionSummaryType::kHour)
+            if (curType == dbCommon::entities::EAcquisitionSummaryType::kHour)
             {
                fromDate = boost::posix_time::ptime(dataTime.date(), boost::posix_time::hours(pt_tm.tm_hour));
             }
-            else if (curType == database::entities::EAcquisitionSummaryType::kDay)
+            else if (curType == dbCommon::entities::EAcquisitionSummaryType::kDay)
             {
                fromDate = boost::posix_time::ptime(dataTime.date());
             }
 
             auto checkq = m_databaseRequester->newQuery();
             checkq.SelectCount().
-                  From(CAcquisitionSummaryTable::getTableName()).
-                  Where(CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, curType).
-                  And(CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
-                  And(CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_EQUAL, fromDate);
+                  From(dbCommon::CAcquisitionSummaryTable::getTableName()).
+                  Where(dbCommon::CAcquisitionSummaryTable::getTypeColumnName(), CQUERY_OP_EQUAL, curType).
+                  And(dbCommon::CAcquisitionSummaryTable::getKeywordIdColumnName(), CQUERY_OP_EQUAL, keywordId).
+                  And(dbCommon::CAcquisitionSummaryTable::getDateColumnName(), CQUERY_OP_EQUAL, fromDate);
 
             return (m_databaseRequester->queryCount(checkq) > 0);
          }
@@ -607,8 +608,8 @@ namespace database
          int CAcquisition::purgeAcquisitions(boost::posix_time::ptime purgeDate)
          {
             auto q = m_databaseRequester->newQuery();
-            q.DeleteFrom(CAcquisitionTable::getTableName()).
-             Where(CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF, purgeDate);
+            q.DeleteFrom(dbCommon::CAcquisitionTable::getTableName()).
+             Where(dbCommon::CAcquisitionTable::getDateColumnName(), CQUERY_OP_INF, purgeDate);
 
             auto count = m_databaseRequester->queryStatement(q);
             if (count < 0)

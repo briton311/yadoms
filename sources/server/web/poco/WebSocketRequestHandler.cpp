@@ -64,12 +64,12 @@ namespace web
             observers.push_back(newAcquisitionSummaryObserver);
 
             // Subscribe to new device notifications
-            observers.push_back(notification::CHelpers::subscribeChangeObserver<database::entities::CDevice>(notification::change::EChangeType::kCreate,
+            observers.push_back(notification::CHelpers::subscribeChangeObserver<dbCommon::entities::CDevice>(notification::change::EChangeType::kCreate,
                                                                                                              *eventHandler,
                                                                                                              kNewDevice));
 
             // Subscribe to event logger notifications
-            observers.push_back(notification::CHelpers::subscribeBasicObserver<database::entities::CEventLogger>(*eventHandler,
+            observers.push_back(notification::CHelpers::subscribeBasicObserver<dbCommon::entities::CEventLogger>(*eventHandler,
                                                                                                                  kNewLogEvent));
 
             // Subscribe to task progression notifications
@@ -214,14 +214,14 @@ namespace web
 
                case kNewDevice:
                   {
-                     auto newDevice = eventHandler->getEventData<boost::shared_ptr<database::entities::CDevice>>();
+                     auto newDevice = eventHandler->getEventData<boost::shared_ptr<dbCommon::entities::CDevice>>();
                      clientSeemConnected = send(webSocket, ws::CNewDeviceFrame(newDevice));
                      break;
                   }
 
                case kNewLogEvent:
                   {
-                     auto logEvent = eventHandler->getEventData<boost::shared_ptr<database::entities::CEventLogger>>();
+                     auto logEvent = eventHandler->getEventData<boost::shared_ptr<dbCommon::entities::CEventLogger>>();
                      clientSeemConnected = send(webSocket, ws::CLogEventFrame(logEvent));
                      break;
                   }

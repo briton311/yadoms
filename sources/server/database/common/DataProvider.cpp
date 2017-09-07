@@ -2,19 +2,19 @@
 #include "DataProvider.h"
 #include "versioning/VersionUpgraderFactory.h"
 #include "versioning/VersionException.h"
-#include "DatabaseTables.h"
-#include "adapters/SingleValueAdapter.hpp"
+#include <dbCommon/DatabaseTables.h>
+#include <dbCommon/adapters/SingleValueAdapter.hpp>
 #include "SummaryDataTask.h"
 #include "PurgeTask.h"
 #include <Poco/DateTime.h>
 #include <shared/Log.h>
-#include "database/DatabaseException.hpp"
+#include <dbCommon/DatabaseException.hpp>
 
 namespace database
 {
    namespace common
    {
-      CDataProvider::CDataProvider(boost::shared_ptr<IDatabaseRequester> databaseRequester)
+      CDataProvider::CDataProvider(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester)
          : m_databaseRequester(databaseRequester),
            m_maintenanceTimer(boost::make_shared<Poco::Util::Timer>())
       {
@@ -33,15 +33,15 @@ namespace database
 
          try
          {
-            if (m_databaseRequester->checkTableExists(CConfigurationTable::getTableName()))
+            if (m_databaseRequester->checkTableExists(dbCommon::CConfigurationTable::getTableName()))
             {
                auto qVersion = m_databaseRequester->newQuery();
-               qVersion.Select(CConfigurationTable::getValueColumnName()).
-                       From(CConfigurationTable::getTableName()).
-                       Where(CConfigurationTable::getSectionColumnName(), CQUERY_OP_EQUAL, "Database").
-                       And(CConfigurationTable::getNameColumnName(), CQUERY_OP_EQUAL, "Version");
+               qVersion.Select(dbCommon::CConfigurationTable::getValueColumnName()).
+                       From(dbCommon::CConfigurationTable::getTableName()).
+                       Where(dbCommon::CConfigurationTable::getSectionColumnName(), CQUERY_OP_EQUAL, "Database").
+                       And(dbCommon::CConfigurationTable::getNameColumnName(), CQUERY_OP_EQUAL, "Version");
 
-               adapters::CSingleValueAdapter<std::string> adapter;
+               dbCommon::adapters::CSingleValueAdapter<std::string> adapter;
                m_databaseRequester->queryEntities(&adapter, qVersion);
                auto results = adapter.getResults();
 
@@ -91,7 +91,7 @@ namespace database
             YADOMS_LOG(error) << "Fail to load database (upgrade error) : " << std::endl << exc.what();
             result = false;
          }
-         catch (CDatabaseException& dbex)
+         catch (dbCommon::CDatabaseException& dbex)
          {
             YADOMS_LOG(error) << "Database exception while loading database" << std::endl << dbex.what();
             result = false;
@@ -201,11 +201,11 @@ namespace database
       }
 
 
-      boost::shared_ptr<ITransactionalProvider> CDataProvider::getTransactionalEngine()
+      boost::shared_ptr<dbCommon::ITransactionalProvider> CDataProvider::getTransactionalEngine()
       {
          if (m_databaseRequester->transactionSupport() && !m_databaseRequester->transactionIsAlreadyCreated())
             return m_databaseRequester;
-         return boost::shared_ptr<ITransactionalProvider>();
+         return boost::shared_ptr<dbCommon::ITransactionalProvider>();
       }
    } //namespace common
 } //namespace database

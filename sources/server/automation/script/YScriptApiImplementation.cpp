@@ -43,7 +43,7 @@ namespace automation
 
       int CYScriptApiImplementation::getKeywordId(const std::string& deviceName, const std::string& keywordName) const
       {
-         std::vector<boost::shared_ptr<database::entities::CKeyword>> keywords;
+         std::vector<boost::shared_ptr<dbCommon::entities::CKeyword>> keywords;
          try
          {
             auto devices = m_dbDeviceRequester->getDevicesIdFromFriendlyName(deviceName);
@@ -75,7 +75,7 @@ namespace automation
 
       int CYScriptApiImplementation::getRecipientId(const std::string& firstName, const std::string& lastName) const
       {
-         boost::shared_ptr<database::entities::CRecipient> recipients;
+         boost::shared_ptr<dbCommon::entities::CRecipient> recipients;
          try
          {
             recipients = m_dbRecipientRequester->getRecipient(firstName, lastName);

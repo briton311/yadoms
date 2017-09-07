@@ -1,6 +1,6 @@
 #pragma once
 #include "FrameBase.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
 namespace web
 {
@@ -16,7 +16,7 @@ namespace web
          ///\brief Constructor
          ///\param[in] acquisition     The acquisition to send to GUI
          //-----------------------------
-         explicit CAcquisitionUpdateFrame(boost::shared_ptr<const database::entities::CAcquisition> acquisition);
+         explicit CAcquisitionUpdateFrame(boost::shared_ptr<const dbCommon::entities::CAcquisition> acquisition);
 
          //-----------------------------
          ///\brief Destructor

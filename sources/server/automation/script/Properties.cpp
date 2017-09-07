@@ -5,7 +5,7 @@ namespace automation
 {
    namespace script
    {
-      CProperties::CProperties(boost::shared_ptr<const database::entities::CRule> ruleData,
+      CProperties::CProperties(boost::shared_ptr<const dbCommon::entities::CRule> ruleData,
                                const IPathProvider& pathProvider)
          : m_interpreterName(ruleData->Interpreter()),
            m_modelBased(!ruleData->Model().empty()),
@@ -18,7 +18,7 @@ namespace automation
       {
       }
 
-      boost::filesystem::path CProperties::buildScriptPath(boost::shared_ptr<const database::entities::CRule> ruleData) const
+      boost::filesystem::path CProperties::buildScriptPath(boost::shared_ptr<const dbCommon::entities::CRule> ruleData) const
       {
          boost::filesystem::path scriptPath("scripts");
 
@@ -57,3 +57,5 @@ namespace automation
       }
    }
 } // namespace automation::script
+
+

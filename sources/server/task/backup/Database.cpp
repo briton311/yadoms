@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <shared/exception/InvalidParameter.hpp>
-#include "database/IDataBackup.h"
 #include "task/ITask.h"
 #include "Database.h"
 
@@ -10,7 +9,7 @@ namespace task
    {
       std::string CDatabase::m_taskName = "database.backup";
 
-      CDatabase::CDatabase(boost::shared_ptr<database::IDataBackup> dataBackupInterface)
+      CDatabase::CDatabase(boost::shared_ptr<dbCommon::IDataBackup> dataBackupInterface)
          : m_dataBackupInterface(dataBackupInterface)
       {
          if (!m_dataBackupInterface)
@@ -26,9 +25,9 @@ namespace task
          return m_taskName;
       }
 
-      void CDatabase::OnProgressionUpdatedInternal(int remaining, int total, const std::string& message)
+      void CDatabase::OnProgressionUpdatedInternal(int remaining, int total, const std::string& message) const
       {
-         float progression = total != 0 ? ((float)(total - remaining) * (float)100.0 / (float)total) : 0;
+         const auto progression = total != 0 ? (static_cast<float>(total - remaining) * 100.0f / static_cast<float>(total)) : 0.0f;
 
          if (m_reportRealProgress)
             m_reportRealProgress(true, progression, message, std::string(), shared::CDataContainer::EmptyContainer);

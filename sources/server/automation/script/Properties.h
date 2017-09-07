@@ -1,6 +1,6 @@
 #pragma once
 #include "IProperties.h"
-#include <database/entities/Entities.h>
+#include <dbCommon/entities/Entities.h>
 #include "IPathProvider.h"
 
 namespace automation
@@ -18,7 +18,7 @@ namespace automation
          ///\param[in] ruleData     Rule data
          ///\param[in] pathProvider The path provider
          //-----------------------------------------------------
-         explicit CProperties(boost::shared_ptr<const database::entities::CRule> ruleData,
+         explicit CProperties(boost::shared_ptr<const dbCommon::entities::CRule> ruleData,
                               const IPathProvider& pathProvider);
 
          //-----------------------------------------------------
@@ -39,7 +39,7 @@ namespace automation
          ///\param[in] ruleData Rule data
          ///\return              The script path
          //-----------------------------------------------------
-         boost::filesystem::path buildScriptPath(boost::shared_ptr<const database::entities::CRule> ruleData) const;
+         boost::filesystem::path buildScriptPath(boost::shared_ptr<const dbCommon::entities::CRule> ruleData) const;
 
       private:
          //-----------------------------------------------------
@@ -64,3 +64,5 @@ namespace automation
       };
    }
 } // namespace automation::script
+
+

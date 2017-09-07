@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IVersionUpgrade.h"
-#include "database/IDatabaseRequester.h"
+#include <dbCommon/IDatabaseRequester.h>
 
 
 namespace database
@@ -27,12 +27,12 @@ namespace database
             virtual ~CVersion_1_0_0();
 
             // ISQLiteVersionUpgrade implementation
-            void checkForUpgrade(const boost::shared_ptr<IDatabaseRequester>& pRequester,
+            void checkForUpgrade(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester,
                                  const shared::versioning::CVersion& currentVersion) override;
             // [END] ISQLiteVersionUpgrade implementation
 
          protected:
-            static void updateDatabaseVersion(const boost::shared_ptr<IDatabaseRequester> pRequester,
+            static void updateDatabaseVersion(const boost::shared_ptr<dbCommon::IDatabaseRequester> pRequester,
                                               const shared::versioning::CVersion& newVersion);
 
          private:
@@ -45,7 +45,7 @@ namespace database
             /// \brief     Create the database (when tables are not found)
             ///\param [in] pRequester : database requester object
             //-----------------------------------
-            static void CreateDatabase(const boost::shared_ptr<IDatabaseRequester>& pRequester);
+            static void CreateDatabase(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester);
          };
       } //namespace versioning
    } //namespace common

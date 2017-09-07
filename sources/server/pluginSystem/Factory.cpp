@@ -34,7 +34,7 @@ namespace pluginSystem
       return boost::make_shared<CInformation>(m_pathProvider.pluginsPath() / pluginName);
    }
 
-   boost::shared_ptr<IInstance> CFactory::createInstance(boost::shared_ptr<const database::entities::CPlugin> instanceData,
+   boost::shared_ptr<IInstance> CFactory::createInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                          boost::shared_ptr<database::IDataProvider> dataProvider,
                                                          boost::shared_ptr<dataAccessLayer::IDataAccessLayer> dataAccessLayer,
                                                          boost::shared_ptr<IQualifier> qualifier,
@@ -79,7 +79,7 @@ namespace pluginSystem
                                            yPluginApi);
    }
 
-   boost::shared_ptr<IInstance> CFactory::createInternalPluginInstance(boost::shared_ptr<const database::entities::CPlugin> instanceData,
+   boost::shared_ptr<IInstance> CFactory::createInternalPluginInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                                        boost::shared_ptr<database::IDataProvider> dataProvider,
                                                                        boost::shared_ptr<dataAccessLayer::IDataAccessLayer> dataAccessLayer,
                                                                        boost::shared_ptr<IQualifier> qualifier,
@@ -122,7 +122,7 @@ namespace pluginSystem
    }
 
 
-   boost::shared_ptr<CInstanceStateHandler> CFactory::createInstanceStateHandler(boost::shared_ptr<const database::entities::CPlugin> instanceData,
+   boost::shared_ptr<CInstanceStateHandler> CFactory::createInstanceStateHandler(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                                                  boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                                                                                  boost::shared_ptr<database::IDataProvider> dataProvider,
                                                                                  boost::shared_ptr<dataAccessLayer::IDataAccessLayer> dataAccessLayer,
@@ -175,7 +175,7 @@ namespace pluginSystem
    }
 
    boost::shared_ptr<CYPluginApiImplementation> CFactory::createApiPluginImplementation(boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
-                                                                                        boost::shared_ptr<const database::entities::CPlugin> instanceData,
+                                                                                        boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                                                         boost::shared_ptr<IInstanceStateHandler> instanceStateHandler,
                                                                                         boost::shared_ptr<database::IDataProvider> dataProvider,
                                                                                         boost::shared_ptr<dataAccessLayer::IDataAccessLayer> dataAccessLayer) const
@@ -192,7 +192,7 @@ namespace pluginSystem
    }
 
    boost::shared_ptr<IIpcAdapter> CFactory::createInstanceRunningContext(boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
-                                                                         boost::shared_ptr<const database::entities::CPlugin> instanceData,
+                                                                         boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                                          boost::shared_ptr<IInstanceStateHandler> instanceStateHandler,
                                                                          boost::shared_ptr<database::IDataProvider> dataProvider,
                                                                          boost::shared_ptr<dataAccessLayer::IDataAccessLayer> dataAccessLayer) const

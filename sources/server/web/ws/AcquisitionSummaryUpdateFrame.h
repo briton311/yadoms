@@ -1,6 +1,6 @@
 #pragma once
 #include "FrameBase.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
 namespace web
 {
@@ -16,7 +16,7 @@ namespace web
          ///\brief Constructor
          ///\param[in] acquisitionSummaries     The acquisition summaries to send to GUI
          //-----------------------------
-         explicit CAcquisitionSummaryUpdateFrame(const std::vector<boost::shared_ptr<database::entities::CAcquisitionSummary> >& acquisitionSummaries);
+         explicit CAcquisitionSummaryUpdateFrame(const std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary> >& acquisitionSummaries);
 
          //-----------------------------
          ///\brief Destructor

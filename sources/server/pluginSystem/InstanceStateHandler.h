@@ -30,7 +30,7 @@ namespace pluginSystem
       ///\param[in] deviceManager            Database device access layer
       ///\param[in] keywordManager           Database keyword access layer
       //-----------------------------------------------------
-      CInstanceStateHandler(boost::shared_ptr<const database::entities::CPlugin> instanceData,
+      CInstanceStateHandler(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                             boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                             boost::shared_ptr<database::IPluginRequester> pluginRequester,
                             boost::shared_ptr<IQualifier> qualifier,
@@ -91,7 +91,7 @@ namespace pluginSystem
       //-----------------------------------------------------
       ///\brief               The instance data
       //-----------------------------------------------------
-      boost::shared_ptr<const database::entities::CPlugin> m_instanceData;
+      boost::shared_ptr<const dbCommon::entities::CPlugin> m_instanceData;
 
       //-----------------------------------------------------
       ///\brief               The plugin information

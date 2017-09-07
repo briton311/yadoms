@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common/Query.h"
+#include <dbCommon/Query.h>
 
 
 namespace database
@@ -10,7 +10,7 @@ namespace database
       //
       /// \brief  Class used to create queries
       //
-      class CSQLiteQuery : public common::CQuery
+      class CSQLiteQuery : public dbCommon::CQuery
       {
       public:
          //
@@ -23,9 +23,9 @@ namespace database
          //
          virtual ~CSQLiteQuery();
 
-         // Overriding common::CQuery
+         // Overriding dbCommon::CQuery
          std::string functionDateToIsoString(const std::string& sqlPart) override;
-         // [END] - Overriding common::CQuery 
+         // [END] - Overriding dbCommon::CQuery
       };
    } //namespace sqlite
 } //namespace database 

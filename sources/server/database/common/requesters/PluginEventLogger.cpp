@@ -2,10 +2,10 @@
 #include "PluginEventLogger.h"
 #include <shared/currentTime/Provider.h>
 #include <shared/exception/EmptyResult.hpp>
-#include "database/common/adapters/SingleValueAdapter.hpp"
-#include "database/common/adapters/DatabaseAdapters.h"
-#include "database/common/DatabaseTables.h"
-#include "database/common/Query.h"
+#include <dbCommon/adapters/SingleValueAdapter.hpp>
+#include <dbCommon/adapters/DatabaseAdapters.h>
+#include <dbCommon/DatabaseTables.h>
+#include <dbCommon/Query.h>
 
 
 namespace database
@@ -14,7 +14,7 @@ namespace database
    {
       namespace requesters
       {
-         CPluginEventLogger::CPluginEventLogger(boost::shared_ptr<IDatabaseRequester> databaseRequester)
+         CPluginEventLogger::CPluginEventLogger(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester)
             : m_databaseRequester(databaseRequester)
          {
          }
@@ -25,17 +25,17 @@ namespace database
 
          // IPluginEventLoggerRequester implementation
 
-         int CPluginEventLogger::addEvent(const std::string& pluginName, const std::string& pluginVersion, const entities::EEventType& eventType, const std::string& message)
+         int CPluginEventLogger::addEvent(const std::string& pluginName, const std::string& pluginVersion, const dbCommon::entities::EEventType& eventType, const std::string& message)
          {
             auto insertDate = shared::currentTime::Provider().now();
 
             auto qInsert = m_databaseRequester->newQuery();
-            qInsert.InsertInto(CPluginEventLoggerTable::getTableName(),
-                               CPluginEventLoggerTable::getPluginNameColumnName(),
-                               CPluginEventLoggerTable::getPluginVersionColumnName(),
-                               CPluginEventLoggerTable::getEventTypeColumnName(),
-                               CPluginEventLoggerTable::getMessageColumnName(),
-                               CPluginEventLoggerTable::getEventDateColumnName()).
+            qInsert.InsertInto(dbCommon::CPluginEventLoggerTable::getTableName(),
+                               dbCommon::CPluginEventLoggerTable::getPluginNameColumnName(),
+                               dbCommon::CPluginEventLoggerTable::getPluginVersionColumnName(),
+                               dbCommon::CPluginEventLoggerTable::getEventTypeColumnName(),
+                               dbCommon::CPluginEventLoggerTable::getMessageColumnName(),
+                               dbCommon::CPluginEventLoggerTable::getEventDateColumnName()).
                    Values(pluginName,
                           pluginVersion,
                           eventType,
@@ -46,15 +46,15 @@ namespace database
                throw shared::exception::CEmptyResult("No lines affected");
 
             auto qSelect = m_databaseRequester->newQuery();
-            qSelect.Select(CPluginEventLoggerTable::getIdColumnName()).
-                   From(CPluginEventLoggerTable::getTableName()).
-                   Where(CPluginEventLoggerTable::getPluginNameColumnName(), CQUERY_OP_EQUAL, pluginName).
-                   And(CPluginEventLoggerTable::getPluginVersionColumnName(), CQUERY_OP_EQUAL, pluginVersion).
-                   And(CPluginEventLoggerTable::getEventTypeColumnName(), CQUERY_OP_EQUAL, eventType).
-                   And(CPluginEventLoggerTable::getEventDateColumnName(), CQUERY_OP_EQUAL, insertDate).
-                   OrderBy(CPluginEventLoggerTable::getIdColumnName(), CQuery::kDesc);
+            qSelect.Select(dbCommon::CPluginEventLoggerTable::getIdColumnName()).
+                   From(dbCommon::CPluginEventLoggerTable::getTableName()).
+                   Where(dbCommon::CPluginEventLoggerTable::getPluginNameColumnName(), CQUERY_OP_EQUAL, pluginName).
+                   And(dbCommon::CPluginEventLoggerTable::getPluginVersionColumnName(), CQUERY_OP_EQUAL, pluginVersion).
+                   And(dbCommon::CPluginEventLoggerTable::getEventTypeColumnName(), CQUERY_OP_EQUAL, eventType).
+                   And(dbCommon::CPluginEventLoggerTable::getEventDateColumnName(), CQUERY_OP_EQUAL, insertDate).
+                   OrderBy(dbCommon::CPluginEventLoggerTable::getIdColumnName(), dbCommon::CQuery::kDesc);
 
-            adapters::CSingleValueAdapter<int> adapter;
+            dbCommon::adapters::CSingleValueAdapter<int> adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             if (adapter.getResults().size() >= 1)
                return adapter.getResults()[0];
@@ -62,7 +62,7 @@ namespace database
             throw shared::exception::CEmptyResult("Cannot retrieve inserted Plugin");
          }
 
-         int CPluginEventLogger::addEvent(const entities::CPluginEventLogger& pluginLogEntry)
+         int CPluginEventLogger::addEvent(const dbCommon::entities::CPluginEventLogger& pluginLogEntry)
          {
             return addEvent(pluginLogEntry.PluginName(),
                             pluginLogEntry.PluginVersion(),
@@ -70,32 +70,32 @@ namespace database
                             pluginLogEntry.Message());
          }
 
-         std::vector<boost::shared_ptr<entities::CPluginEventLogger>> CPluginEventLogger::getPluginEvents(const std::string& pluginName, const std::string& pluginVersion)
+         std::vector<boost::shared_ptr<dbCommon::entities::CPluginEventLogger>> CPluginEventLogger::getPluginEvents(const std::string& pluginName, const std::string& pluginVersion)
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CPluginEventLoggerTable::getTableName()).
-                   Where(CPluginEventLoggerTable::getPluginNameColumnName(), CQUERY_OP_EQUAL, pluginName).
-                   And(CPluginEventLoggerTable::getPluginVersionColumnName(), CQUERY_OP_EQUAL, pluginVersion).
-                   OrderBy(CPluginEventLoggerTable::getEventDateColumnName(), CQuery::kDesc);
+                   From(dbCommon::CPluginEventLoggerTable::getTableName()).
+                   Where(dbCommon::CPluginEventLoggerTable::getPluginNameColumnName(), CQUERY_OP_EQUAL, pluginName).
+                   And(dbCommon::CPluginEventLoggerTable::getPluginVersionColumnName(), CQUERY_OP_EQUAL, pluginVersion).
+                   OrderBy(dbCommon::CPluginEventLoggerTable::getEventDateColumnName(), dbCommon::CQuery::kDesc);
 
-            adapters::CPluginEventLoggerAdapter adapter;
+            dbCommon::adapters::CPluginEventLoggerAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }
 
 
-         std::vector<boost::shared_ptr<entities::CPluginEventLogger>> CPluginEventLogger::getPluginEvents(const std::string& pluginName, const std::string& pluginVersion, const boost::posix_time::ptime& fromDate)
+         std::vector<boost::shared_ptr<dbCommon::entities::CPluginEventLogger>> CPluginEventLogger::getPluginEvents(const std::string& pluginName, const std::string& pluginVersion, const boost::posix_time::ptime& fromDate)
          {
             auto qSelect = m_databaseRequester->newQuery();
             qSelect.Select().
-                   From(CPluginEventLoggerTable::getTableName()).
-                   Where(CPluginEventLoggerTable::getPluginNameColumnName(), CQUERY_OP_EQUAL, pluginName).
-                   And(CPluginEventLoggerTable::getPluginVersionColumnName(), CQUERY_OP_EQUAL, pluginVersion).
-                   And(CPluginEventLoggerTable::getEventDateColumnName(), CQUERY_OP_SUP, fromDate).
-                   OrderBy(CPluginEventLoggerTable::getEventDateColumnName(), CQuery::kDesc);
+                   From(dbCommon::CPluginEventLoggerTable::getTableName()).
+                   Where(dbCommon::CPluginEventLoggerTable::getPluginNameColumnName(), CQUERY_OP_EQUAL, pluginName).
+                   And(dbCommon::CPluginEventLoggerTable::getPluginVersionColumnName(), CQUERY_OP_EQUAL, pluginVersion).
+                   And(dbCommon::CPluginEventLoggerTable::getEventDateColumnName(), CQUERY_OP_SUP, fromDate).
+                   OrderBy(dbCommon::CPluginEventLoggerTable::getEventDateColumnName(), dbCommon::CQuery::kDesc);
 
-            adapters::CPluginEventLoggerAdapter adapter;
+            dbCommon::adapters::CPluginEventLoggerAdapter adapter;
             m_databaseRequester->queryEntities(&adapter, qSelect);
             return adapter.getResults();
          }

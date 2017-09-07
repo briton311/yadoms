@@ -118,7 +118,7 @@ namespace pluginSystem
       startInternalPlugin();
    }
 
-   bool CManager::startInstances(const std::vector<boost::shared_ptr<database::entities::CPlugin>>& instances,
+   bool CManager::startInstances(const std::vector<boost::shared_ptr<dbCommon::entities::CPlugin>>& instances,
                                  std::set<int>& startedInstanceIds)
    {
       auto allInstancesStarted = true;
@@ -126,7 +126,7 @@ namespace pluginSystem
       {
          try
          {
-            if ((*it)->Category() != database::entities::EPluginCategory::kSystem)
+            if ((*it)->Category() != dbCommon::entities::EPluginCategory::kSystem)
                if ((*it)->AutoStart())
                {
                   YADOMS_LOG(debug) << "Start plugin instance " << (*it)->Id() << "...";
@@ -170,7 +170,7 @@ namespace pluginSystem
       return m_qualifier->getQualityLevel(m_availablePlugins.at(pluginName));
    }
 
-   int CManager::createInstance(const database::entities::CPlugin& data)
+   int CManager::createInstance(const dbCommon::entities::CPlugin& data)
    {
       boost::lock_guard<boost::recursive_mutex> lock(m_runningInstancesMutex);
 
@@ -188,7 +188,7 @@ namespace pluginSystem
       try
       {
          auto instanceData = m_pluginDBTable->getInstance(id);
-         if (instanceData->Category() == database::entities::EPluginCategory::kSystem)
+         if (instanceData->Category() == dbCommon::entities::EPluginCategory::kSystem)
             return;
 
          // Stop plugin instance
@@ -252,13 +252,13 @@ namespace pluginSystem
       }
    }
 
-   std::vector<boost::shared_ptr<database::entities::CPlugin>> CManager::getInstanceList() const
+   std::vector<boost::shared_ptr<dbCommon::entities::CPlugin>> CManager::getInstanceList() const
    {
       boost::lock_guard<boost::recursive_mutex> lock(m_runningInstancesMutex);
       return m_pluginDBTable->getInstances();
    }
 
-   boost::shared_ptr<database::entities::CPlugin> CManager::getInstance(int id) const
+   boost::shared_ptr<dbCommon::entities::CPlugin> CManager::getInstance(int id) const
    {
       boost::lock_guard<boost::recursive_mutex> lock(m_runningInstancesMutex);
       return m_pluginDBTable->getInstance(id);
@@ -275,7 +275,7 @@ namespace pluginSystem
       return instance->second;
    }
 
-   void CManager::updateInstance(const database::entities::CPlugin& newData)
+   void CManager::updateInstance(const dbCommon::entities::CPlugin& newData)
    {
       boost::lock_guard<boost::recursive_mutex> lock(m_runningInstancesMutex);
 
@@ -284,7 +284,7 @@ namespace pluginSystem
          throw shared::exception::CException("Update instance : instance ID was not provided");
 
       // First get old configuration from database
-      boost::shared_ptr<const database::entities::CPlugin> previousData = m_pluginDBTable->getInstance(newData.Id());
+      boost::shared_ptr<const dbCommon::entities::CPlugin> previousData = m_pluginDBTable->getInstance(newData.Id());
 
       // Next, update configuration in database
       m_pluginDBTable->updateInstance(newData);
@@ -540,7 +540,7 @@ namespace pluginSystem
       if (!isInstanceRunning(id))
       {
          // Instance is not running, so can be in error or stopped state
-         boost::shared_ptr<database::entities::CDevice> device;
+         boost::shared_ptr<dbCommon::entities::CDevice> device;
          try
          {
             // First find the pluginState device associated with the plugin
@@ -594,7 +594,7 @@ namespace pluginSystem
       }
 
       // Instance is running
-      boost::shared_ptr<database::entities::CDevice> device;
+      boost::shared_ptr<dbCommon::entities::CDevice> device;
       try
       {
          // First find the pluginState device associated with the plugin
@@ -655,7 +655,7 @@ namespace pluginSystem
       instance->postDeviceCommand(command);
    }
 
-   const std::string CManager::postExtraQuery(int id, boost::shared_ptr<shared::plugin::yPluginApi::IExtraQuery> query) const
+   std::string CManager::postExtraQuery(int id, boost::shared_ptr<shared::plugin::yPluginApi::IExtraQuery> query) const
    {
       boost::lock_guard<boost::recursive_mutex> lock(m_runningInstancesMutex);
       auto instance(getRunningInstance(id));
@@ -665,8 +665,7 @@ namespace pluginSystem
       boost::shared_ptr<task::ITask> task(boost::make_shared<task::plugins::CExtraQuery>(instance, query)); 
 
       std::string taskUid = "";
-      bool result = m_taskScheduler->runTask(task, taskUid);
-      if(!result)
+      if(!m_taskScheduler->runTask(task, taskUid))
       {
          YADOMS_LOG(error) << "Fail to send extra query " << query->getData()->query() << " to plugin " << instance->about()->DisplayName();
          //ensure taskId is set to ""

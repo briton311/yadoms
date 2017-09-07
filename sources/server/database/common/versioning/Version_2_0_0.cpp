@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Version_2_0_0.h"
-#include "database/common/Query.h"
-#include "database/common/DatabaseTables.h"
+#include <dbCommon/Query.h>
+#include <dbCommon/DatabaseTables.h>
 #include <shared/versioning/Version.h>
 #include "VersionException.h"
 #include <shared/Log.h>
@@ -24,7 +24,7 @@ namespace database
          }
 
          // ISQLiteVersionUpgrade implementation
-         void CVersion_2_0_0::checkForUpgrade(const boost::shared_ptr<IDatabaseRequester>& pRequester, const shared::versioning::CVersion& currentVersion)
+         void CVersion_2_0_0::checkForUpgrade(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester, const shared::versioning::CVersion& currentVersion)
          {
             if (currentVersion < Version)
             {
@@ -48,7 +48,7 @@ namespace database
          ///\param [in] pRequester : database requester object
          ///\throw      CVersionException if create database failed
          //-----------------------------------
-         void CVersion_2_0_0::UpdateFrom1_0_0(const boost::shared_ptr<IDatabaseRequester>& pRequester) const
+         void CVersion_2_0_0::UpdateFrom1_0_0(const boost::shared_ptr<dbCommon::IDatabaseRequester>& pRequester)
          {
             try
             {
@@ -59,9 +59,9 @@ namespace database
                   pRequester->transactionBegin();
 
                //add column
-               pRequester->addTableColumn(CDeviceTable::getTableName(), "configuration TEXT");
-               pRequester->addTableColumn(CDeviceTable::getTableName(), "blacklist INTEGER DEFAULT 0");
-               pRequester->addTableColumn(CKeywordTable::getTableName(), "blacklist INTEGER DEFAULT 0");
+               pRequester->addTableColumn(dbCommon::CDeviceTable::getTableName(), "configuration TEXT");
+               pRequester->addTableColumn(dbCommon::CDeviceTable::getTableName(), "blacklist INTEGER DEFAULT 0");
+               pRequester->addTableColumn(dbCommon::CKeywordTable::getTableName(), "blacklist INTEGER DEFAULT 0");
 
                //set the database version
                updateDatabaseVersion(pRequester,

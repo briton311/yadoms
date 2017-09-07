@@ -81,7 +81,7 @@ namespace pluginSystem
       /// \throw           CException if fails
       /// \throw           CDatabaseException if duplicate record (instance name must be unique)
       //--------------------------------------------------------------
-      int createInstance(const database::entities::CPlugin& data);
+      int createInstance(const dbCommon::entities::CPlugin& data);
 
       //--------------------------------------------------------------
       /// \brief           Delete a plugin instance
@@ -101,7 +101,7 @@ namespace pluginSystem
       /// \brief           Get the plugin instances list
       /// \return          List of instances ID of all known instances, started or not
       //--------------------------------------------------------------
-      std::vector<boost::shared_ptr<database::entities::CPlugin>> getInstanceList() const;
+      std::vector<boost::shared_ptr<dbCommon::entities::CPlugin>> getInstanceList() const;
 
       //--------------------------------------------------------------
       /// \brief           Get the instance configuration
@@ -109,7 +109,7 @@ namespace pluginSystem
       /// \return          The instance configuration, if available (empty string if not)
       /// \throw           CException if fails
       //--------------------------------------------------------------
-      boost::shared_ptr<database::entities::CPlugin> getInstance(int id) const;
+      boost::shared_ptr<dbCommon::entities::CPlugin> getInstance(int id) const;
 
       //--------------------------------------------------------------
       /// \brief           Get a running instance
@@ -123,7 +123,7 @@ namespace pluginSystem
       /// \brief           Update instance data
       /// \param [in] newData   The new data
       //--------------------------------------------------------------
-      void updateInstance(const database::entities::CPlugin& newData);
+      void updateInstance(const dbCommon::entities::CPlugin& newData);
 
       //--------------------------------------------------------------
       /// \brief           Start a registered instance of plugin
@@ -198,7 +198,7 @@ namespace pluginSystem
       /// \param [in] query      The query to post
       /// \return                The task id
       //--------------------------------------------------------------
-      const std::string postExtraQuery(int id, boost::shared_ptr<shared::plugin::yPluginApi::IExtraQuery> query) const;
+      std::string postExtraQuery(int id, boost::shared_ptr<shared::plugin::yPluginApi::IExtraQuery> query) const;
 
       //--------------------------------------------------------------
       /// \brief                 Post a manually device creation request to a plugin
@@ -263,7 +263,7 @@ namespace pluginSystem
       ///\param[out] startedInstanceIds Instances started
       ///\return              true if all instances were successfully started
       //-----------------------------------------------------
-      bool startInstances(const std::vector<boost::shared_ptr<database::entities::CPlugin>>& instances,
+      bool startInstances(const std::vector<boost::shared_ptr<dbCommon::entities::CPlugin>>& instances,
                           std::set<int>& startedInstanceIds);
 
       //-----------------------------------------------------

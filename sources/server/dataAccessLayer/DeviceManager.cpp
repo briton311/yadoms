@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "DeviceManager.h"
 #include "notification/Helpers.hpp"
-#include <shared/Log.h>
 #include <shared/plugin/yPluginApi/historization/DeviceStateMessage.h>
 
 namespace dataAccessLayer
@@ -31,27 +30,27 @@ namespace dataAccessLayer
       return m_deviceRequester->deviceExists(pluginId, deviceName);
    }
 
-   boost::shared_ptr<database::entities::CDevice> CDeviceManager::getDevice(int deviceId) const
+   boost::shared_ptr<dbCommon::entities::CDevice> CDeviceManager::getDevice(int deviceId) const
    {
       return m_deviceRequester->getDevice(deviceId);
    }
 
-   boost::shared_ptr<database::entities::CDevice> CDeviceManager::getDeviceInPlugin(const int pluginId, const std::string& name, bool includeBlacklistDevice) const
+   boost::shared_ptr<dbCommon::entities::CDevice> CDeviceManager::getDeviceInPlugin(const int pluginId, const std::string& name, bool includeBlacklistDevice) const
    {
       return m_deviceRequester->getDeviceInPlugin(pluginId, name, includeBlacklistDevice);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CDevice>> CDeviceManager::getDeviceWithCapacity(const std::string& capacityName, const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const
+   std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDeviceManager::getDeviceWithCapacity(const std::string& capacityName, const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const
    {
       return m_deviceRequester->getDeviceWithCapacity(capacityName, capacityAccessMode);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CDevice>> CDeviceManager::getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode, const shared::plugin::yPluginApi::EKeywordDataType& capacityType) const
+   std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDeviceManager::getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode, const shared::plugin::yPluginApi::EKeywordDataType& capacityType) const
    {
       return m_deviceRequester->getDeviceWithCapacityType(capacityAccessMode, capacityType);
    }
 
-   boost::shared_ptr<database::entities::CDevice> CDeviceManager::createDevice(int pluginId, const std::string& name, const std::string& friendlyName, const std::string& type, const std::string& model, const shared::CDataContainer& details)
+   boost::shared_ptr<dbCommon::entities::CDevice> CDeviceManager::createDevice(int pluginId, const std::string& name, const std::string& friendlyName, const std::string& type, const std::string& model, const shared::CDataContainer& details)
    {
       //create the device
       auto result = m_deviceRequester->createDevice(pluginId, name, friendlyName, type, model, details);
@@ -61,7 +60,7 @@ namespace dataAccessLayer
       return result;
    }
 
-   std::vector<boost::shared_ptr<database::entities::CDevice>> CDeviceManager::getDevices() const
+   std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> CDeviceManager::getDevices() const
    {
       return m_deviceRequester->getDevices();
    }
@@ -104,7 +103,7 @@ namespace dataAccessLayer
    void CDeviceManager::updateDeviceBlacklistState(int deviceId, const bool blacklist)
    {
       //cleanup data
-      if(blacklist)
+      if (blacklist)
          cleanupDevice(deviceId);
 
       //update blacklist state of all attached keywords
@@ -116,9 +115,8 @@ namespace dataAccessLayer
       m_deviceRequester->updateDeviceBlacklistState(deviceId, blacklist);
    }
 
-   void CDeviceManager::updateDeviceState(int deviceId, const shared::plugin::yPluginApi::historization::EDeviceState& state, const std::string& customMessageId, const shared::CDataContainer &data) const
+   void CDeviceManager::updateDeviceState(int deviceId, const shared::plugin::yPluginApi::historization::EDeviceState& state, const std::string& customMessageId, const shared::CDataContainer& data) const
    {
-
       //if keywords do exist, create them
       shared::plugin::yPluginApi::historization::CDeviceState ds("deviceState");
       auto stateKeywords = m_keywordRequester->getDeviceKeywordsWithCapacity(deviceId, ds.getCapacity().getName(), shared::plugin::yPluginApi::EKeywordAccessMode::kGet);
@@ -136,7 +134,7 @@ namespace dataAccessLayer
 
       //update deviceSate
       ds.set(state);
-     
+
       //update deviceMessageState
       dsm.set(data);
 
@@ -150,8 +148,6 @@ namespace dataAccessLayer
       for (auto i = stateMessageKeywords.begin(); i != stateMessageKeywords.end(); ++i)
          m_acquisitionRequester->saveData((*i)->Id, dsm.formatValue(), currentDate);
    }
-
-  
 
 
    void CDeviceManager::removeDevice(int deviceId)

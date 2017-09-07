@@ -5,7 +5,7 @@
 #include "IUnique.h"
 #include "shared/ThreadBase.h"
 #include "TaskEvent.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 #include <shared/Log.h>
 
 #include "Scheduler.h"
@@ -51,8 +51,8 @@ namespace task
                   case ETaskStatus::kStartedValue:
                   {
                      //the task has started
-                     database::entities::CEventLogger entry;
-                     entry.Code = database::entities::ESystemEventCode::kStarted;
+                     dbCommon::entities::CEventLogger entry;
+                     entry.Code = dbCommon::entities::ESystemEventCode::kStarted;
                      entry.Who = m_runningTasks[i->getGuid()]->getTask()->getName();
                      m_eventLogger->addEvent(entry);
                      break;
@@ -101,8 +101,8 @@ namespace task
          {
             YADOMS_LOG(error) << "taskScheduler crashed in doWork with exception : " << e.what();
 
-            database::entities::CEventLogger entry;
-            entry.Code = database::entities::ESystemEventCode::kThreadFailed;
+            dbCommon::entities::CEventLogger entry;
+            entry.Code = dbCommon::entities::ESystemEventCode::kThreadFailed;
             entry.Who = "taskScheduler";
             entry.What = (boost::format("Crashed in doWork with exception %1%") % e.what()).str();
             m_eventLogger->addEvent(entry);
@@ -111,8 +111,8 @@ namespace task
          {
             YADOMS_LOG(error) << "task scheduler unkonwn exception";
 
-            database::entities::CEventLogger entry;
-            entry.Code = database::entities::ESystemEventCode::kThreadFailed;
+            dbCommon::entities::CEventLogger entry;
+            entry.Code = dbCommon::entities::ESystemEventCode::kThreadFailed;
             entry.Who = "taskScheduler";
             entry.What = "crash with unknown exception.";
             m_eventLogger->addEvent(entry);

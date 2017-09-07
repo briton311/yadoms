@@ -30,7 +30,7 @@ namespace pluginSystem
       /// \param [in]   process                    The instance process
       /// \param [in]   ipcAdapter                 The api IPC adapter
       //--------------------------------------------------------------
-      CInstance(boost::shared_ptr<const database::entities::CPlugin> instanceInformation,
+      CInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceInformation,
                 const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                 const boost::filesystem::path& dataPath,
                 const boost::filesystem::path& logPath,
@@ -46,7 +46,7 @@ namespace pluginSystem
       void updateConfiguration(const shared::CDataContainer& newConfiguration) override;
       void requestStop() override;
       void kill() override;
-      boost::shared_ptr<const database::entities::CPlugin> about() const override;
+      boost::shared_ptr<const dbCommon::entities::CPlugin> about() const override;
       boost::shared_ptr<const shared::plugin::information::IInformation> aboutPlugin() const override;
       void postDeviceCommand(boost::shared_ptr<const shared::plugin::yPluginApi::IDeviceCommand> deviceCommand) override;
       void postExtraQuery(boost::shared_ptr<shared::plugin::yPluginApi::IExtraQuery> extraQuery, const std::string & taskId) override;
@@ -65,7 +65,7 @@ namespace pluginSystem
       //--------------------------------------------------------------
       /// \brief			      The plugin information
       //--------------------------------------------------------------
-      const boost::shared_ptr<const database::entities::CPlugin> m_instanceInformation;
+      const boost::shared_ptr<const dbCommon::entities::CPlugin> m_instanceInformation;
 
       //--------------------------------------------------------------
       /// \brief			      The plugin information

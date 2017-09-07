@@ -6,7 +6,8 @@
 #include <shared/plugin/yPluginApi/IDeviceConfigurationSchemaRequest.h>
 #include <shared/plugin/yPluginApi/IDeviceRemoved.h>
 #include <shared/plugin/yPluginApi/ISetDeviceConfiguration.h>
-#include "database/entities/Entities.h"
+#include <shared/plugin/information/IInformation.h>
+#include <dbCommon/entities/Entities.h>
 
 namespace pluginSystem
 {
@@ -41,7 +42,7 @@ namespace pluginSystem
       ///\brief               Get information about this instance
       ///\return              Instance information
       //-----------------------------------------------------
-      virtual boost::shared_ptr<const database::entities::CPlugin> about() const = 0;
+      virtual boost::shared_ptr<const dbCommon::entities::CPlugin> about() const = 0;
 
       //-----------------------------------------------------
       ///\brief               Get information about the plugin associated with this instance

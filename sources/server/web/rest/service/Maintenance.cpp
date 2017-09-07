@@ -1,177 +1,176 @@
 #include "stdafx.h"
 #include "Maintenance.h"
-#include <shared/exception/NotImplemented.hpp>
 #include "web/rest/RestDispatcherHelpers.hpp"
 #include "web/rest/RestDispatcher.h"
 #include "web/rest/Result.h"
 #include "task/backup/Database.h"
 #include <shared/Log.h>
-#include <boost/date_time/local_time_adjustor.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
 
-namespace web { namespace rest { namespace service {
-
-   std::string CMaintenance::m_restKeyword= std::string("maintenance");
-
-   CMaintenance::CMaintenance(boost::shared_ptr<database::IDatabaseRequester> databaseRequester, boost::shared_ptr<task::CScheduler> taskScheduler)
-      :m_databaseRequester(databaseRequester), m_taskScheduler(taskScheduler)
+namespace web
+{
+   namespace rest
    {
-   }
-
-
-   CMaintenance::~CMaintenance()
-   {
-   }
-
-
-   void CMaintenance::configureDispatcher(CRestDispatcher & dispatcher)
-   {
-      REGISTER_DISPATCHER_HANDLER(dispatcher, "GET", (m_restKeyword)("information"), CMaintenance::getDatabaseInformation);
-      REGISTER_DISPATCHER_HANDLER(dispatcher, "GET", (m_restKeyword)("lastBackup"), CMaintenance::getLastDatabaseBackup);
-      REGISTER_DISPATCHER_HANDLER(dispatcher, "POST", (m_restKeyword)("backup"), CMaintenance::startDatabaseBackup);
-      REGISTER_DISPATCHER_HANDLER(dispatcher, "DELETE", (m_restKeyword)("lastBackup"), CMaintenance::deleteLastDatabaseBackup);
-   }
-
-
-   const std::string & CMaintenance::getRestKeyword()
-   {
-      return m_restKeyword;
-   }
-
-   shared::CDataContainer CMaintenance::getDatabaseInformation(const std::vector<std::string> & parameters, const std::string & requestContent)
-   {
-      try
+      namespace service
       {
-         shared::CDataContainer result = m_databaseRequester->getInformation();
-         result.set("backupSupport", m_databaseRequester->backupSupported());
-         return CResult::GenerateSuccess(result);
-      }
-      catch (std::exception &ex)
-      {
-         return CResult::GenerateError(ex);
-      }
-      catch (...)
-      {
-         return CResult::GenerateError("unknown exception in retreiving database information");
-      }      
-   }
-   
-   shared::CDataContainer CMaintenance::startDatabaseBackup(const std::vector<std::string> & parameters, const std::string & requestContent)
-   {
-      try
-      {
-         if (m_databaseRequester->backupSupported())
+         std::string CMaintenance::m_restKeyword = std::string("maintenance");
+
+         CMaintenance::CMaintenance(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester, boost::shared_ptr<task::CScheduler> taskScheduler)
+            : m_databaseRequester(databaseRequester), m_taskScheduler(taskScheduler)
          {
-            boost::shared_ptr<task::ITask> task(new task::backup::CDatabase(m_databaseRequester));
-
-            std::string taskUid;
-            if (m_taskScheduler->runTask(task, taskUid))
-               YADOMS_LOG(information) << "Task : " << task->getName() << " successfully started. TaskId = " << taskUid;
-            else
-               YADOMS_LOG(error) << "Task : " << task->getName() << " fail to start";
-
-
-            shared::CDataContainer result;
-            result.set("taskId", taskUid);
-            return web::rest::CResult::GenerateSuccess(result);
          }
-         else
+
+
+         CMaintenance::~CMaintenance()
          {
-            return web::rest::CResult::GenerateError("backup not supported");
          }
-      }
-      catch (std::exception &ex)
-      {
-         return CResult::GenerateError(ex);
-      }
-      catch (...)
-      {
-         return CResult::GenerateError("unknown exception in starting database backup");
-      }
-      
-   }
 
-   shared::CDataContainer CMaintenance::getLastDatabaseBackup(const std::vector<std::string> & parameters, const std::string & requestContent)
-   {
-      try
-      {
-         if (m_databaseRequester->backupSupported())
+
+         void CMaintenance::configureDispatcher(CRestDispatcher& dispatcher)
          {
-            auto backup = m_databaseRequester->lastBackupData();
+            REGISTER_DISPATCHER_HANDLER(dispatcher, "GET", (m_restKeyword)("information"), CMaintenance::getDatabaseInformation);
+            REGISTER_DISPATCHER_HANDLER(dispatcher, "GET", (m_restKeyword)("lastBackup"), CMaintenance::getLastDatabaseBackup);
+            REGISTER_DISPATCHER_HANDLER(dispatcher, "POST", (m_restKeyword)("backup"), CMaintenance::startDatabaseBackup);
+            REGISTER_DISPATCHER_HANDLER(dispatcher, "DELETE", (m_restKeyword)("lastBackup"), CMaintenance::deleteLastDatabaseBackup);
+         }
 
-            if (boost::filesystem::exists(backup))
+
+         const std::string& CMaintenance::getRestKeyword()
+         {
+            return m_restKeyword;
+         }
+
+         shared::CDataContainer CMaintenance::getDatabaseInformation(const std::vector<std::string>& parameters, const std::string& requestContent) const
+         {
+            try
             {
-               auto filesize = boost::filesystem::file_size(backup);
-            
-               auto lastWriteTimeT = boost::filesystem::last_write_time(backup);
-               auto lastWriteTimePosix = boost::date_time::c_local_adjustor<boost::posix_time::ptime>::utc_to_local(boost::posix_time::from_time_t(lastWriteTimeT));
-
-               shared::CDataContainer result;
-               result.set("size", filesize);
-               result.set("modificationDate", lastWriteTimePosix);
-               result.set("path", backup.string());
-               result.set("url", backup.filename().string());
-               return web::rest::CResult::GenerateSuccess(result);
+               shared::CDataContainer result = m_databaseRequester->getInformation();
+               result.set("backupSupport", m_databaseRequester->backupSupported());
+               return CResult::GenerateSuccess(result);
             }
-            else
+            catch (std::exception& ex)
             {
-               //backup do not exists
-               return web::rest::CResult::GenerateError();
+               return CResult::GenerateError(ex);
+            }
+            catch (...)
+            {
+               return CResult::GenerateError("unknown exception in retreiving database information");
             }
          }
-         else
-         {
-            return web::rest::CResult::GenerateError("backup not supported");
-         }
-         
-      }
-      catch (std::exception &ex)
-      {
-         return CResult::GenerateError(ex);
-      }
-      catch (...)
-      {
-         return CResult::GenerateError("unknown exception in retreiving last backup data");
-      }
 
-   }
-
-   shared::CDataContainer CMaintenance::deleteLastDatabaseBackup(const std::vector<std::string> & parameters, const std::string & requestContent)
-   {
-      try
-      {
-         if (m_databaseRequester->backupSupported())
+         shared::CDataContainer CMaintenance::startDatabaseBackup(const std::vector<std::string>& parameters, const std::string& requestContent) const
          {
-            auto backup = m_databaseRequester->lastBackupData();
-            if (boost::filesystem::exists(backup))
+            try
             {
-               boost::system::error_code ec;
-               if (boost::filesystem::remove(backup, ec))
-                  return web::rest::CResult::GenerateSuccess();
-               return web::rest::CResult::GenerateError(ec.message());
+               if (m_databaseRequester->backupSupported())
+               {
+                  auto task(boost::make_shared<task::backup::CDatabase>(m_databaseRequester));
+
+                  std::string taskUid;
+                  if (m_taskScheduler->runTask(task, taskUid))
+                  YADOMS_LOG(information) << "Task : " << task->getName() << " successfully started. TaskId = " << taskUid;
+                  else
+                  YADOMS_LOG(error) << "Task : " << task->getName() << " fail to start";
+
+
+                  shared::CDataContainer result;
+                  result.set("taskId", taskUid);
+                  return web::rest::CResult::GenerateSuccess(result);
+               }
+               else
+               {
+                  return web::rest::CResult::GenerateError("backup not supported");
+               }
             }
-            else
+            catch (std::exception& ex)
             {
-               //backup do not exists
-               return web::rest::CResult::GenerateError();
+               return CResult::GenerateError(ex);
+            }
+            catch (...)
+            {
+               return CResult::GenerateError("unknown exception in starting database backup");
             }
          }
-         else
+
+         shared::CDataContainer CMaintenance::getLastDatabaseBackup(const std::vector<std::string>& parameters, const std::string& requestContent) const
          {
-            return web::rest::CResult::GenerateError("backup not supported");
+            try
+            {
+               if (m_databaseRequester->backupSupported())
+               {
+                  auto backup = m_databaseRequester->lastBackupData();
+
+                  if (boost::filesystem::exists(backup))
+                  {
+                     auto filesize = boost::filesystem::file_size(backup);
+
+                     auto lastWriteTimeT = boost::filesystem::last_write_time(backup);
+                     auto lastWriteTimePosix = boost::date_time::c_local_adjustor<boost::posix_time::ptime>::utc_to_local(boost::posix_time::from_time_t(lastWriteTimeT));
+
+                     shared::CDataContainer result;
+                     result.set("size", filesize);
+                     result.set("modificationDate", lastWriteTimePosix);
+                     result.set("path", backup.string());
+                     result.set("url", backup.filename().string());
+                     return web::rest::CResult::GenerateSuccess(result);
+                  }
+                  else
+                  {
+                     //backup do not exists
+                     return web::rest::CResult::GenerateError();
+                  }
+               }
+               else
+               {
+                  return web::rest::CResult::GenerateError("backup not supported");
+               }
+            }
+            catch (std::exception& ex)
+            {
+               return CResult::GenerateError(ex);
+            }
+            catch (...)
+            {
+               return CResult::GenerateError("unknown exception in retreiving last backup data");
+            }
          }
-      }
-      catch (std::exception &ex)
-      {
-         return CResult::GenerateError(ex);
-      }
-      catch (...)
-      {
-         return CResult::GenerateError("unknown exception in deleting last backup data");
-      }
 
-   }
-
-} //namespace service
-} //namespace rest
+         shared::CDataContainer CMaintenance::deleteLastDatabaseBackup(const std::vector<std::string>& parameters, const std::string& requestContent) const
+         {
+            try
+            {
+               if (m_databaseRequester->backupSupported())
+               {
+                  auto backup = m_databaseRequester->lastBackupData();
+                  if (boost::filesystem::exists(backup))
+                  {
+                     boost::system::error_code ec;
+                     if (boost::filesystem::remove(backup, ec))
+                        return web::rest::CResult::GenerateSuccess();
+                     return web::rest::CResult::GenerateError(ec.message());
+                  }
+                  else
+                  {
+                     //backup do not exists
+                     return web::rest::CResult::GenerateError();
+                  }
+               }
+               else
+               {
+                  return web::rest::CResult::GenerateError("backup not supported");
+               }
+            }
+            catch (std::exception& ex)
+            {
+               return CResult::GenerateError(ex);
+            }
+            catch (...)
+            {
+               return CResult::GenerateError("unknown exception in deleting last backup data");
+            }
+         }
+      } //namespace service
+   } //namespace rest
 } //namespace web 
+
+

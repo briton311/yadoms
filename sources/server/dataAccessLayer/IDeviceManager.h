@@ -1,5 +1,5 @@
 #pragma once
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 #include <shared/plugin/yPluginApi/historization/DeviceState.h>
 
 namespace dataAccessLayer
@@ -28,7 +28,7 @@ namespace dataAccessLayer
       /// \param [in] deviceId            Device Id
       /// \throw                          shared::exception::CEmptyResult if deviceId is unknown
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<database::entities::CDevice> getDevice(int deviceId) const = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CDevice> getDevice(int deviceId) const = 0;
 
       //--------------------------------------------------------------
       /// \brief                          Get a device identified by (pluginId and name).
@@ -37,7 +37,8 @@ namespace dataAccessLayer
       /// \return                         The device found
       /// \throw                          shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<database::entities::CDevice> getDeviceInPlugin(const int pluginId, const std::string& name, bool includeBlacklistDevice) const = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CDevice> getDeviceInPlugin(const int pluginId, const std::string& name,
+                                                                               bool includeBlacklistDevice) const = 0;
 
 
       //--------------------------------------------------------------
@@ -47,7 +48,7 @@ namespace dataAccessLayer
       /// \return                         the device list which support a capacity
       /// \throw  shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CDevice>> getDeviceWithCapacity(const std::string& capacityName,
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> getDeviceWithCapacity(const std::string& capacityName,
                                                                                                 const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode) const = 0;
 
       //--------------------------------------------------------------
@@ -57,7 +58,7 @@ namespace dataAccessLayer
       /// \return                         the device list which support a capacity
       /// \throw  shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CDevice>> getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode,
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> getDeviceWithCapacityType(const shared::plugin::yPluginApi::EKeywordAccessMode& capacityAccessMode,
                                                                                                     const shared::plugin::yPluginApi::EKeywordDataType& capacityType) const = 0;
 
       //--------------------------------------------------------------
@@ -71,7 +72,7 @@ namespace dataAccessLayer
       /// \return                         The device created (null if creation failed)
       /// \throw  shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<database::entities::CDevice> createDevice(int pluginId,
+      virtual boost::shared_ptr<dbCommon::entities::CDevice> createDevice(int pluginId,
                                                                           const std::string& name,
                                                                           const std::string& friendlyName,
                                                                           const std::string& type,
@@ -82,7 +83,7 @@ namespace dataAccessLayer
       /// \brief           List all devices
       /// \return          List of registered devices
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<database::entities::CDevice>> getDevices() const = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CDevice>> getDevices() const = 0;
 
       //--------------------------------------------------------------
       /// \brief           Get all devices of a plugin instance
@@ -149,7 +150,7 @@ namespace dataAccessLayer
       /// \param [in] data                The device state message data
       /// \throw  shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual void updateDeviceState(int deviceId, const shared::plugin::yPluginApi::historization::EDeviceState& state, const std::string& customMessageId, const shared::CDataContainer &data) const = 0;
+      virtual void updateDeviceState(int deviceId, const shared::plugin::yPluginApi::historization::EDeviceState& state, const std::string& customMessageId, const shared::CDataContainer& data) const = 0;
 
       //--------------------------------------------------------------
       /// \brief           Remove device 
@@ -187,3 +188,5 @@ namespace dataAccessLayer
       }
    };
 } //namespace dataAccessLayer 
+
+

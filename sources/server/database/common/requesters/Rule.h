@@ -1,7 +1,7 @@
 #pragma once
 
 #include "database/IRuleRequester.h"
-#include "database/IDatabaseRequester.h"
+#include <dbCommon/IDatabaseRequester.h>
 
 namespace database
 {
@@ -19,7 +19,7 @@ namespace database
             /// \Brief		   Constructor
             /// \param [in]	pDatabaseHandler: the database handler
             //--------------------------------------------------------------
-            explicit CRule(boost::shared_ptr<IDatabaseRequester> databaseRequester);
+            explicit CRule(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester);
 
             //--------------------------------------------------------------
             /// \Brief		   Destructor
@@ -27,11 +27,11 @@ namespace database
             virtual ~CRule();
 
             // IRuleRequester implementation
-            std::vector<boost::shared_ptr<entities::CRule> > getRules() const override;
-            std::vector<boost::shared_ptr<entities::CRule> > getRules(const std::string& interpreterName) const override;
-            boost::shared_ptr<entities::CRule> getRule(int ruleId) const override;
-            int addRule(boost::shared_ptr<const entities::CRule> ruleData) override;
-            void updateRule(boost::shared_ptr<const entities::CRule> ruleData) override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CRule>> getRules() const override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CRule>> getRules(const std::string& interpreterName) const override;
+            boost::shared_ptr<dbCommon::entities::CRule> getRule(int ruleId) const override;
+            int addRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData) override;
+            void updateRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData) override;
             void deleteRule(int ruleId) override;
             // [END] IRuleRequester implementation
 
@@ -39,7 +39,7 @@ namespace database
             //--------------------------------------------------------------
             /// \Brief		   Reference to IDatabaseRequester
             //--------------------------------------------------------------
-            boost::shared_ptr<IDatabaseRequester> m_databaseRequester;
+            boost::shared_ptr<dbCommon::IDatabaseRequester> m_databaseRequester;
          };
       } //namespace requesters
    } //namespace common

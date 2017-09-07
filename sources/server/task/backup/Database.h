@@ -1,6 +1,6 @@
 #pragma once
 #include "task/ITask.h"
-#include "database/IDataBackup.h"
+#include <dbCommon/IDataBackup.h>
 
 namespace task
 {
@@ -15,24 +15,23 @@ namespace task
          //------------------------------------------
          ///\brief   Constructor
          //------------------------------------------
-         explicit CDatabase(boost::shared_ptr<database::IDataBackup> dataBackupInterface);
+         explicit CDatabase(boost::shared_ptr<dbCommon::IDataBackup> dataBackupInterface);
 
          //------------------------------------------
          ///\brief   Destructor
          //------------------------------------------
          virtual ~CDatabase();
 
-      public:
          // ITask implementation
-         virtual const std::string& getName();
-         virtual void doWork(TaskProgressFunc pFunctor);
+         const std::string& getName() override;
+         void doWork(TaskProgressFunc pFunctor) override;
          // [END] ITask implementation
 
       private:
          //------------------------------------------
          ///\brief   Internal progress handler
          //------------------------------------------
-         void OnProgressionUpdatedInternal(int remaining, int total, const std::string& message = std::string());
+         void OnProgressionUpdatedInternal(int remaining, int total, const std::string& message = std::string()) const;
 
          //------------------------------------------
          ///\brief   The task name
@@ -42,7 +41,7 @@ namespace task
          //------------------------------------------
          ///\brief   The backup data interface
          //------------------------------------------
-         boost::shared_ptr<database::IDataBackup> m_dataBackupInterface;
+         boost::shared_ptr<dbCommon::IDataBackup> m_dataBackupInterface;
 
          //------------------------------------------
          ///\brief   The function pointer for reporting progression

@@ -4,7 +4,7 @@
 
 namespace pluginSystem
 {
-   CInstanceStateHandler::CInstanceStateHandler(boost::shared_ptr<const database::entities::CPlugin> instanceData,
+   CInstanceStateHandler::CInstanceStateHandler(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceData,
                                                 boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                                                 boost::shared_ptr<database::IPluginRequester> pluginRequester,
                                                 boost::shared_ptr<IQualifier> qualifier,
@@ -147,17 +147,17 @@ namespace pluginSystem
 
    void CInstanceStateHandler::recordPluginEvent(PluginEventSeverity severity, const std::string& message)
    {
-      database::entities::EEventType evenType;
+      dbCommon::entities::EEventType evenType;
       switch (severity)
       {
-      case kError: evenType = database::entities::EEventType::kError;
+      case kError: evenType = dbCommon::entities::EEventType::kError;
          break;
-      case kInfo: evenType = database::entities::EEventType::kInfo;
+      case kInfo: evenType = dbCommon::entities::EEventType::kInfo;
          break;
       default:
          {
             YADOMS_LOG(warning) << "Unknown plugin event severity type " << severity;
-            evenType = database::entities::EEventType::kInfo; // Set a default value
+            evenType = dbCommon::entities::EEventType::kInfo; // Set a default value
             break;
          }
       }

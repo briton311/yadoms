@@ -1,6 +1,6 @@
 #pragma once
 #include "IRule.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 #include "interpreter/IManager.h"
 #include <shared/script/yScriptApi/IYScriptApi.h>
 #include "script/IGeneralInfo.h"
@@ -21,7 +21,7 @@ namespace automation
    class CRule : public IRule
    {
    public:
-      CRule(boost::shared_ptr<const database::entities::CRule> ruleData,
+      CRule(boost::shared_ptr<const dbCommon::entities::CRule> ruleData,
             const IPathProvider& pathProvider,
             boost::shared_ptr<interpreter::IManager> interpreterManager,
             boost::shared_ptr<communication::ISendMessageAsync> pluginGateway,
@@ -59,7 +59,7 @@ namespace automation
 
    private:
       const IPathProvider& m_pathProvider;
-      boost::shared_ptr<const database::entities::CRule> m_ruleData;
+      boost::shared_ptr<const dbCommon::entities::CRule> m_ruleData;
       boost::shared_ptr<interpreter::IManager> m_interpreterManager;
 
       boost::shared_ptr<interpreter::IInstance> m_scriptInterpreter;

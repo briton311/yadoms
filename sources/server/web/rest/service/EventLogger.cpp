@@ -123,7 +123,7 @@ namespace web
          {
             try
             {
-               database::entities::CEventLogger entityToAdd;
+               dbCommon::entities::CEventLogger entityToAdd;
                entityToAdd.fillFromSerializedString(requestContent);
                m_dataProvider->addEvent(entityToAdd);
                return CResult::GenerateSuccess();

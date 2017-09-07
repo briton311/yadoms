@@ -5,7 +5,7 @@
 
 namespace pluginSystem
 {
-   CInstance::CInstance(boost::shared_ptr<const database::entities::CPlugin> instanceInformation,
+   CInstance::CInstance(boost::shared_ptr<const dbCommon::entities::CPlugin> instanceInformation,
                         const boost::shared_ptr<const shared::plugin::information::IInformation> pluginInformation,
                         const boost::filesystem::path& dataPath,
                         const boost::filesystem::path& logPath,
@@ -88,7 +88,7 @@ namespace pluginSystem
       m_ipcAdapter->postUpdateConfiguration(newConfiguration);
    }
 
-   boost::shared_ptr<const database::entities::CPlugin> CInstance::about() const
+   boost::shared_ptr<const dbCommon::entities::CPlugin> CInstance::about() const
    {
       return m_instanceInformation;
    }

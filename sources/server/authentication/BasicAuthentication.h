@@ -2,7 +2,7 @@
 #include "IAuthentication.h"
 #include "dataAccessLayer/IConfigurationManager.h"
 #include "notification/IObserver.h"
-#include "database/entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
 
 namespace authentication
@@ -37,7 +37,7 @@ namespace authentication
       //--------------------------------------------------------------
       /// \brief  Function called when the configuration has been updated
       //--------------------------------------------------------------
-      void onConfigurationUpdated(boost::shared_ptr<database::entities::CConfiguration> newConfiguration);
+      void onConfigurationUpdated(boost::shared_ptr<dbCommon::entities::CConfiguration> newConfiguration);
 
       //--------------------------------------------------------------
       /// \brief  Function which read authentication settings from database

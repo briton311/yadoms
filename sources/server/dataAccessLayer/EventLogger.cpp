@@ -5,9 +5,8 @@
 
 namespace dataAccessLayer
 {
-
    CEventLogger::CEventLogger(boost::shared_ptr<database::IEventLoggerRequester> requester)
-      :m_requester(requester)
+      : m_requester(requester)
    {
    }
 
@@ -15,47 +14,48 @@ namespace dataAccessLayer
    {
    }
 
-   int CEventLogger::addEvent(const database::entities::ESystemEventCode& eventType, const std::string& who, const std::string& what)
+   int CEventLogger::addEvent(const dbCommon::entities::ESystemEventCode& eventType, const std::string& who, const std::string& what)
    {
       int eventId = m_requester->addEvent(eventType, who, what);
-      
+
       // Post notification
       notification::CHelpers::postNotification(m_requester->getEvent(eventId));
 
       return eventId;
    }
 
-   int CEventLogger::addEvent(const database::entities::CEventLogger& logEntry)
+   int CEventLogger::addEvent(const dbCommon::entities::CEventLogger& logEntry)
    {
-      if(!logEntry.Code.isDefined())
-         throw shared::exception::CEmptyResult("The event code must be filled");      
+      if (!logEntry.Code.isDefined())
+         throw shared::exception::CEmptyResult("The event code must be filled");
 
       return addEvent(logEntry.Code(), logEntry.Who(), logEntry.What());
    }
-   
-   std::vector<boost::shared_ptr<database::entities::CEventLogger> > CEventLogger::getEvents()
+
+   std::vector<boost::shared_ptr<dbCommon::entities::CEventLogger>> CEventLogger::getEvents()
    {
       return m_requester->getEvents();
    }
 
-   boost::shared_ptr<database::entities::CEventLogger> CEventLogger::getEvent(const int eventId)
+   boost::shared_ptr<dbCommon::entities::CEventLogger> CEventLogger::getEvent(const int eventId)
    {
-      return m_requester->getEvent(eventId); 
+      return m_requester->getEvent(eventId);
    }
 
-   boost::shared_ptr<database::entities::CEventLogger> CEventLogger::getLastEvent()
+   boost::shared_ptr<dbCommon::entities::CEventLogger> CEventLogger::getLastEvent()
    {
-      return m_requester->getLastEvent(); 
+      return m_requester->getLastEvent();
    }
 
-   std::vector<boost::shared_ptr<database::entities::CEventLogger> > CEventLogger::getEventsFrom(const int eventId)
+   std::vector<boost::shared_ptr<dbCommon::entities::CEventLogger>> CEventLogger::getEventsFrom(const int eventId)
    {
       return m_requester->getEventsFrom(eventId);
    }
 
-   std::vector<boost::shared_ptr<database::entities::CEventLogger> > CEventLogger::getEventsRange(const int offset, const int count)
+   std::vector<boost::shared_ptr<dbCommon::entities::CEventLogger>> CEventLogger::getEventsRange(const int offset, const int count)
    {
       return m_requester->getEventsRange(offset, count);
    }
-
 } //namespace dataAccessLayer 
+
+

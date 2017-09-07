@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <exception>
 
 namespace shared
@@ -27,7 +26,7 @@ namespace shared
          //--------------------------------------------------------------
          explicit CException(const char* message)
          {
-            if (message != NULL)
+            if (message != nullptr)
                m_message = std::string(message);
          }
 
@@ -47,7 +46,7 @@ namespace shared
          /// \brief	    Build full message explaining exception reason
          /// \return     message explaining exception reason
          //--------------------------------------------------------------
-         virtual char const* what() const throw() override { return m_message.c_str(); }
+         char const* what() const throw() override { return m_message.c_str(); }
 
       protected:
          //--------------------------------------------------------------

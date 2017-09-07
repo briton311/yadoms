@@ -24,7 +24,7 @@ namespace startupOptions
       /// \brief                          Constructor
       /// \param [in]   configContainer   The configuration container
       //--------------------------------------------------------------
-      explicit CStartupOptions(Poco::Util::AbstractConfiguration & configContainer);
+      explicit CStartupOptions(Poco::Util::AbstractConfiguration& configContainer);
 
       //--------------------------------------------------------------
       /// \brief	   Destructor
@@ -87,8 +87,8 @@ namespace startupOptions
       //--------------------------------------------------------------
       /// \brief	   Reference for the configuration container
       //--------------------------------------------------------------
-      Poco::Util::AbstractConfiguration & m_configContainer;
+      Poco::Util::AbstractConfiguration& m_configContainer;
    };
-
-
 } // namespace startupOptions
+
+

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "entities/Entities.h"
+#include <dbCommon/entities/Entities.h>
 
-namespace database { 
-
+namespace database
+{
    class IRecipientRequester
    {
    public:
@@ -12,27 +12,27 @@ namespace database {
       /// \param [in] recipient     Recipient data
       /// \return                   The created recipient
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<entities::CRecipient> addRecipient(const entities::CRecipient & recipient) = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CRecipient> addRecipient(const dbCommon::entities::CRecipient& recipient) = 0;
 
       //--------------------------------------------------------------
       /// \brief                    Udpate a recipient
       /// \param [in] recipient     Recipient data
       /// \return                   The updated recipient
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<entities::CRecipient> updateRecipient(const entities::CRecipient & recipient) = 0;
-   
+      virtual boost::shared_ptr<dbCommon::entities::CRecipient> updateRecipient(const dbCommon::entities::CRecipient& recipient) = 0;
+
       //--------------------------------------------------------------
       /// \brief           List all recipients
       /// \return          List of registered recipients
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<entities::CRecipient> > getRecipients() = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CRecipient>> getRecipients() = 0;
 
       //--------------------------------------------------------------
       /// \brief                    Get one recipient
       /// \param [in] recipientId   Recipient id
       /// \return                   The specified recipient
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<entities::CRecipient> getRecipient(const int recipientId) = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CRecipient> getRecipient(const int recipientId) = 0;
 
       //--------------------------------------------------------------
       /// \brief                    Get one recipient from first and last name
@@ -40,15 +40,15 @@ namespace database {
       /// \param [in] lastName      Recipient last name
       /// \return                   The specified recipient
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<entities::CRecipient> getRecipient(const std::string & firstName, const std::string & lastName) = 0;
-      
+      virtual boost::shared_ptr<dbCommon::entities::CRecipient> getRecipient(const std::string& firstName, const std::string& lastName) = 0;
+
       //--------------------------------------------------------------
       /// \brief                    Check is a recipient exists
       /// \param [in] firstName     Recipient first name
       /// \param [in] lastName      Recipient last name
       /// \return                   true if recipient exists
       //--------------------------------------------------------------
-      virtual bool exists(const std::string & firstName, const std::string & lastName) = 0;
+      virtual bool exists(const std::string& firstName, const std::string& lastName) = 0;
 
       //--------------------------------------------------------------
       /// \brief                    Check if a recipient exists
@@ -83,7 +83,7 @@ namespace database {
       /// \return                   The created field
       /// \throw                    shared::exception::CEmptyResult if fails
       //--------------------------------------------------------------
-      virtual boost::shared_ptr<entities::CRecipientField> createField(const entities::CRecipientField& field) = 0;
+      virtual boost::shared_ptr<dbCommon::entities::CRecipientField> createField(const dbCommon::entities::CRecipientField& field) = 0;
 
       //--------------------------------------------------------------
       ///\brief                           Find a recipient from a specific field value
@@ -91,20 +91,20 @@ namespace database {
       ///\param [in] expectedFieldValue   The expected field value
       ///\return                          The found recipients containing this field with this value
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<entities::CRecipient> > findRecipientsFromField(const std::string& fieldName, const std::string& expectedFieldValue) = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CRecipient>> findRecipientsFromField(const std::string& fieldName, const std::string& expectedFieldValue) = 0;
 
       //--------------------------------------------------------------
       ///\brief                           Get all existing fields
       ///\return                          The fields list
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<entities::CRecipientField> > getFields() = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CRecipientField>> getFields() = 0;
 
       //--------------------------------------------------------------
       ///\brief                           Get all the fields with specific name
       ///\param [in] fieldName            The field name ("mobile", "email", etc...)
       ///\return                          A fields list
       //--------------------------------------------------------------
-      virtual std::vector<boost::shared_ptr<entities::CRecipientField> > getFieldsByName(const std::string& fieldName) = 0;
+      virtual std::vector<boost::shared_ptr<dbCommon::entities::CRecipientField>> getFieldsByName(const std::string& fieldName) = 0;
 
       //--------------------------------------------------------------
       /// \brief       Destructor
@@ -113,6 +113,6 @@ namespace database {
       {
       }
    };
-
- 
 } //namespace database 
+
+

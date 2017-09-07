@@ -1,7 +1,7 @@
 #pragma once
 
 #include "database/IAcquisitionRequester.h"
-#include "database/IDatabaseRequester.h"
+#include <dbCommon/IDatabaseRequester.h>
 
 namespace database
 {
@@ -21,7 +21,7 @@ namespace database
             /// \Brief		   Constructor
             /// \param [in]	databaseRequester the database handler
             //--------------------------------------------------------------
-            CAcquisition(boost::shared_ptr<IDatabaseRequester> databaseRequester,
+            CAcquisition(boost::shared_ptr<dbCommon::IDatabaseRequester> databaseRequester,
                          boost::shared_ptr<CKeyword> keywordRequester);
 
             //--------------------------------------------------------------
@@ -30,41 +30,41 @@ namespace database
             virtual ~CAcquisition();
 
             // IAcquisitionRequester implementation
-            boost::shared_ptr<entities::CAcquisition> saveData(const int keywordId,
-                                                               const std::string& data,
-                                                               boost::posix_time::ptime& dataTime) override;
-            boost::shared_ptr<entities::CAcquisition> incrementData(const int keywordId,
-                                                                    const std::string& increment,
-                                                                    boost::posix_time::ptime& dataTime) override;
-            boost::shared_ptr<entities::CAcquisitionSummary> saveSummaryData(const int keywordId,
-                                                                             database::entities::EAcquisitionSummaryType curType,
-                                                                             boost::posix_time::ptime& dataTime) override;
+            boost::shared_ptr<dbCommon::entities::CAcquisition> saveData(const int keywordId,
+                                                                         const std::string& data,
+                                                                         boost::posix_time::ptime& dataTime) override;
+            boost::shared_ptr<dbCommon::entities::CAcquisition> incrementData(const int keywordId,
+                                                                              const std::string& increment,
+                                                                              boost::posix_time::ptime& dataTime) override;
+            boost::shared_ptr<dbCommon::entities::CAcquisitionSummary> saveSummaryData(const int keywordId,
+                                                                                       dbCommon::entities::EAcquisitionSummaryType curType,
+                                                                                       boost::posix_time::ptime& dataTime) override;
             void getKeywordsHavingDate(const boost::posix_time::ptime& timeFrom,
                                        const boost::posix_time::ptime& timeTo,
                                        std::vector<int>& results) override;
             bool summaryDataExists(const int keywordId,
-                                   database::entities::EAcquisitionSummaryType curType,
+                                   dbCommon::entities::EAcquisitionSummaryType curType,
                                    boost::posix_time::ptime& date) override;
             void removeKeywordData(const int keywordId) override;
-            boost::shared_ptr<entities::CAcquisition> getAcquisitionByKeywordAndDate(const int keywordId,
-                                                                                     boost::posix_time::ptime time) override;
-            boost::shared_ptr<entities::CAcquisition> getKeywordLastData(const int keywordId,
-                                                                         bool throwIfNotExists = true) override;
-            std::vector<boost::tuple<boost::posix_time::ptime, std::string> > getKeywordData(int keywordId,
-                                                                                             boost::posix_time::ptime timeFrom,
-                                                                                             boost::posix_time::ptime timeTo) override;
-            std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > getKeywordDataByDay(int keywordId,
-                                                                                               boost::posix_time::ptime timeFrom,
-                                                                                               boost::posix_time::ptime timeTo) override;
-            std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > getKeywordDataByHour(int keywordId,
-                                                                                                boost::posix_time::ptime timeFrom,
-                                                                                                boost::posix_time::ptime timeTo) override;
-            std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > getKeywordDataByMonth(int keywordId,
-                                                                                                 boost::posix_time::ptime timeFrom,
-                                                                                                 boost::posix_time::ptime timeTo) override;
-            std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > getKeywordDataByYear(int keywordId,
-                                                                                                boost::posix_time::ptime timeFrom,
-                                                                                                boost::posix_time::ptime timeTo) override;
+            boost::shared_ptr<dbCommon::entities::CAcquisition> getAcquisitionByKeywordAndDate(const int keywordId,
+                                                                                               boost::posix_time::ptime time) override;
+            boost::shared_ptr<dbCommon::entities::CAcquisition> getKeywordLastData(const int keywordId,
+                                                                                   bool throwIfNotExists = true) override;
+            std::vector<boost::tuple<boost::posix_time::ptime, std::string>> getKeywordData(int keywordId,
+                                                                                            boost::posix_time::ptime timeFrom,
+                                                                                            boost::posix_time::ptime timeTo) override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> getKeywordDataByDay(int keywordId,
+                                                                                                        boost::posix_time::ptime timeFrom,
+                                                                                                        boost::posix_time::ptime timeTo) override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> getKeywordDataByHour(int keywordId,
+                                                                                                         boost::posix_time::ptime timeFrom,
+                                                                                                         boost::posix_time::ptime timeTo) override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> getKeywordDataByMonth(int keywordId,
+                                                                                                          boost::posix_time::ptime timeFrom,
+                                                                                                          boost::posix_time::ptime timeTo) override;
+            std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> getKeywordDataByYear(int keywordId,
+                                                                                                         boost::posix_time::ptime timeFrom,
+                                                                                                         boost::posix_time::ptime timeTo) override;
             std::string getKeywordHighchartData(int keywordId,
                                                 boost::posix_time::ptime timeFrom,
                                                 boost::posix_time::ptime timeTo) override;
@@ -75,11 +75,11 @@ namespace database
                                                      boost::posix_time::ptime timeFrom,
                                                      boost::posix_time::ptime timeTo) override;
             std::string getKeywordHighchartDataByMonth(int keywordId,
-                                                               boost::posix_time::ptime timeFrom,
-                                                               boost::posix_time::ptime timeTo) override;
+                                                       boost::posix_time::ptime timeFrom,
+                                                       boost::posix_time::ptime timeTo) override;
             std::string getKeywordHighchartDataByYear(int keywordId,
-                                                              boost::posix_time::ptime timeFrom,
-                                                              boost::posix_time::ptime timeTo) override;
+                                                      boost::posix_time::ptime timeFrom,
+                                                      boost::posix_time::ptime timeTo) override;
             int purgeAcquisitions(boost::posix_time::ptime purgeDate) override;
             // [END] IAcquisitionRequester implementation
 
@@ -92,9 +92,9 @@ namespace database
             /// \return                   CAcquisitionSummary data
             /// \throw                    CInvalidParameter if deviceId is unknown
             //--------------------------------------------------------------
-            std::vector<boost::shared_ptr<entities::CAcquisitionSummary> > getKeywordSummaryDataByType(const entities::EAcquisitionSummaryType& type, int keywordId,
-                                                                                                       boost::posix_time::ptime timeFrom,
-                                                                                                       boost::posix_time::ptime timeTo) const;
+            std::vector<boost::shared_ptr<dbCommon::entities::CAcquisitionSummary>> getKeywordSummaryDataByType(const dbCommon::entities::EAcquisitionSummaryType& type, int keywordId,
+                                                                                                                boost::posix_time::ptime timeFrom,
+                                                                                                                boost::posix_time::ptime timeTo) const;
 
             //--------------------------------------------------------------
             /// \brief                    Get the summary data (highchart js format) : [[date,value],[date,value],...] by acquisition type
@@ -105,7 +105,7 @@ namespace database
             /// \return                   Map of data : (date, value). One value per hour
             /// \throw                    CInvalidParameter if deviceId is unknown
             //--------------------------------------------------------------
-            std::string getKeywordHighchartDataByType(const entities::EAcquisitionSummaryType& type,
+            std::string getKeywordHighchartDataByType(const dbCommon::entities::EAcquisitionSummaryType& type,
                                                       int keywordId,
                                                       boost::posix_time::ptime timeFrom,
                                                       boost::posix_time::ptime timeTo) const;
@@ -118,7 +118,7 @@ namespace database
             //--------------------------------------------------------------
             /// \Brief		   Reference to IDatabaseRequester
             //--------------------------------------------------------------
-            boost::shared_ptr<IDatabaseRequester> m_databaseRequester;
+            boost::shared_ptr<dbCommon::IDatabaseRequester> m_databaseRequester;
          };
       }
    }
