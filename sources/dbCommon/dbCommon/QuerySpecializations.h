@@ -27,7 +27,7 @@ struct queryhelper
 {
    static std::string format(CQuery* obj, const T& anyValue)
    {
-      //dont use queryhelper <std::string> because Clang iisue it
+      //dont use queryhelper <std::string> because Clang issue it
       return obj->formatStringToSql(boost::lexical_cast<std::string>(anyValue));
    }
 };
